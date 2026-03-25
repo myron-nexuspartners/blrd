@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,75 +44,59 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  /* BLRD Brand Colors */
+  --blrd-black: #080a0f;
+  --blrd-dark: #0d1117;
+  --blrd-dark-2: #161b22;
+  --blrd-dark-3: #21262d;
+  --blrd-cyan: #00d4ff;
+  --blrd-cyan-dim: #0099bb;
+  --blrd-blue: #1a6fff;
+  --blrd-orange: #ff6b00;
+  --blrd-amber: #ffb300;
+  --blrd-flame: #ff4500;
+  --blrd-white: #f0f6fc;
+  --blrd-gray: #8b949e;
+  --blrd-gray-light: #c9d1d9;
+  --blrd-border: #30363d;
+  --blrd-border-bright: rgba(0,212,255,0.2);
+
+  --radius: 0.375rem;
+  --background: oklch(0.08 0.01 240);
+  --foreground: oklch(0.95 0.01 240);
+  --card: oklch(0.11 0.01 240);
+  --card-foreground: oklch(0.95 0.01 240);
+  --popover: oklch(0.13 0.01 240);
+  --popover-foreground: oklch(0.95 0.01 240);
+  --primary: oklch(0.75 0.18 200);
+  --primary-foreground: oklch(0.08 0.01 240);
+  --secondary: oklch(0.18 0.01 240);
+  --secondary-foreground: oklch(0.95 0.01 240);
+  --muted: oklch(0.18 0.01 240);
+  --muted-foreground: oklch(0.6 0.01 240);
+  --accent: oklch(0.65 0.22 35);
+  --accent-foreground: oklch(0.08 0.01 240);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.95 0.01 240);
+  --border: oklch(0.25 0.02 240);
+  --input: oklch(0.18 0.01 240);
+  --ring: oklch(0.75 0.18 200);
+  --chart-1: oklch(0.75 0.18 200);
+  --chart-2: oklch(0.65 0.22 35);
+  --chart-3: oklch(0.7 0.18 270);
+  --chart-4: oklch(0.75 0.2 150);
+  --chart-5: oklch(0.7 0.22 60);
+  --sidebar: oklch(0.11 0.01 240);
+  --sidebar-foreground: oklch(0.95 0.01 240);
+  --sidebar-primary: oklch(0.75 0.18 200);
+  --sidebar-primary-foreground: oklch(0.08 0.01 240);
+  --sidebar-accent: oklch(0.18 0.01 240);
+  --sidebar-accent-foreground: oklch(0.95 0.01 240);
+  --sidebar-border: oklch(0.25 0.02 240);
+  --sidebar-ring: oklch(0.75 0.18 200);
 }
 
-.dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
-}
+
 
 @layer base {
   * {
@@ -119,6 +104,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -131,6 +122,162 @@
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
   }
+}
+
+/* ─── BLRD Utility Classes ──────────────────────────────────────────────── */
+.font-display { font-family: 'Orbitron', sans-serif !important; }
+.font-ui { font-family: 'Rajdhani', sans-serif !important; }
+
+.blrd-glow { text-shadow: 0 0 20px var(--blrd-cyan), 0 0 40px var(--blrd-cyan-dim); }
+.blrd-glow-orange { text-shadow: 0 0 20px var(--blrd-orange), 0 0 40px var(--blrd-amber); }
+
+.blrd-card {
+  background: var(--blrd-dark-2);
+  border: 1px solid var(--blrd-border);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.blrd-card:hover {
+  border-color: var(--blrd-cyan-dim);
+  box-shadow: 0 4px 20px rgba(0,212,255,0.1);
+  transform: translateY(-1px);
+}
+
+.blrd-tag {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.blrd-tag-gaming { background: rgba(0,212,255,0.15); color: var(--blrd-cyan); border: 1px solid rgba(0,212,255,0.3); }
+.blrd-tag-comics { background: rgba(255,107,0,0.15); color: var(--blrd-orange); border: 1px solid rgba(255,107,0,0.3); }
+.blrd-tag-film { background: rgba(179,136,255,0.15); color: #b388ff; border: 1px solid rgba(179,136,255,0.3); }
+.blrd-tag-tv { background: rgba(100,255,218,0.15); color: #64ffda; border: 1px solid rgba(100,255,218,0.3); }
+.blrd-tag-tech { background: rgba(26,111,255,0.15); color: #5b9fff; border: 1px solid rgba(26,111,255,0.3); }
+.blrd-tag-culture { background: rgba(255,179,0,0.15); color: var(--blrd-amber); border: 1px solid rgba(255,179,0,0.3); }
+.blrd-tag-creators { background: rgba(255,69,0,0.15); color: var(--blrd-flame); border: 1px solid rgba(255,69,0,0.3); }
+.blrd-tag-events { background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
+.blrd-tag-games { background: rgba(0,212,255,0.15); color: var(--blrd-cyan); border: 1px solid rgba(0,212,255,0.3); }
+.blrd-tag-movies { background: rgba(179,136,255,0.15); color: #b388ff; border: 1px solid rgba(179,136,255,0.3); }
+.blrd-tag-music { background: rgba(255,179,0,0.15); color: var(--blrd-amber); border: 1px solid rgba(255,179,0,0.3); }
+
+/* ─── Ad Zone Styles ─────────────────────────────────────────────────────── */
+.ad-zone {
+  background: var(--blrd-dark-2);
+  border: 1px dashed var(--blrd-border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blrd-gray);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  overflow: hidden;
+  position: relative;
+}
+.ad-zone::before {
+  content: 'ADVERTISEMENT';
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: var(--blrd-gray);
+  opacity: 0.6;
+}
+.ad-banner-top { width: 100%; height: 90px; }
+.ad-banner-bottom { width: 100%; height: 90px; }
+.ad-sidebar { width: 100%; height: 250px; }
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--blrd-dark); }
+::-webkit-scrollbar-thumb { background: var(--blrd-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blrd-cyan-dim); }
+
+/* ─── Section Header ─────────────────────────────────────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.section-header h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--blrd-white);
+  white-space: nowrap;
+}
+.section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--blrd-border), transparent);
+}
+
+/* ─── Flame Rating ───────────────────────────────────────────────────────── */
+.flame-icon { font-size: 1.2rem; transition: transform 0.15s ease; filter: grayscale(1) opacity(0.3); cursor: pointer; }
+.flame-icon.active { filter: none; }
+.flame-icon:hover { transform: scale(1.2); }
+
+/* ─── Hero Carousel ──────────────────────────────────────────────────────── */
+.hero-slide { position: relative; overflow: hidden; }
+.hero-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(8,10,15,0.92) 0%, rgba(8,10,15,0.6) 40%, rgba(8,10,15,0.2) 70%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ─── Marquee ────────────────────────────────────────────────────────────── */
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.marquee-track { display: flex; animation: marquee 35s linear infinite; width: max-content; }
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ─── Nav ────────────────────────────────────────────────────────────────── */
+.nav-link {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blrd-gray-light);
+  padding: 6px 10px;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  position: relative;
+  text-decoration: none;
+}
+.nav-link:hover, .nav-link.active { color: var(--blrd-cyan); }
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background: var(--blrd-cyan);
+  border-radius: 1px;
+  box-shadow: 0 0 8px var(--blrd-cyan);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in-up { animation: fadeInUp 0.4s ease forwards; }
+
+@media (max-width: 768px) {
+  .ad-banner-top, .ad-banner-bottom { height: 60px; }
+  .ad-sidebar { height: 200px; }
 }
 
 @layer components {
