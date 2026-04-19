@@ -90,3 +90,14 @@
 - [x] Update Layout.tsx with new logo CDN URL
 - [x] Update favicon in client/public/favicon.ico
 - [x] Apply brand colors across all 8 pages
+
+## Admin Dashboard
+- [x] Extend DB schema: add status fields, admin-only columns to blog_posts, reviews, events
+- [x] Add admin tRPC procedures: blog approval, review CRUD, event CRUD, dashboard stats
+- [x] Admin Dashboard layout with sidebar navigation and role-based access guard
+- [x] Admin overview page with stats (pending posts, total reviews, upcoming events, contacts)
+- [x] Blog Post approval queue: list pending/approved/rejected posts, approve/reject actions
+- [x] Review management: add new review, edit existing, delete, manage Flames ratings
+- [x] Event management: add new event, edit existing, delete, all sortable fields
+- [x] Wire /admin routes in App.tsx with adminOnly guard
+- [x] Write vitest tests for admin procedures

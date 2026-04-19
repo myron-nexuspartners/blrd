@@ -7,6 +7,7 @@ import { contactSubmissions, userRatings, events, articles } from "../drizzle/sc
 import { eq, and, sql } from "drizzle-orm";
 import { z } from "zod/v4";
 import { notifyOwner } from "./_core/notification";
+import { adminRouter } from "./routers/admin";
 
 export const appRouter = router({
   system: systemRouter,
@@ -19,6 +20,9 @@ export const appRouter = router({
     }),
   }),
 
+  // ─── Admin ───────────────────────────────────────────────────────────────
+  admin: adminRouter,
+
   // ─── Reviews ────────────────────────────────────────────────────────────
   reviews: router({
     rate: protectedProcedure
@@ -27,7 +31,6 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database unavailable");
 
-        // Upsert user rating
         await db
           .insert(userRatings)
           .values({
@@ -94,11 +97,14 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database unavailable");
 
-        const slug = input.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "")
-          .slice(0, 200) + "-" + Date.now();
+        const slug =
+          input.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "")
+            .slice(0, 200) +
+          "-" +
+          Date.now();
 
         await db.insert(articles).values({
           slug,
@@ -116,7 +122,6 @@ export const appRouter = router({
           publishedAt: new Date(),
         });
 
-        // Notify owner of new submission
         await notifyOwner({
           title: "New Blog Submission",
           content: `${ctx.user.name || "A user"} submitted a blog post: "${input.title}"`,
