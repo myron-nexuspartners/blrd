@@ -264,7 +264,7 @@ function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
 
       <div
         className="rounded p-3 text-xs"
-        style={{ background: "rgba(255,179,0,0.08)", border: "1px solid rgba(255,179,0,0.2)", color: "var(--blrd-gray-light)" }}
+        style={{ background: "rgba(27,201,201,0.08)", border: "1px solid rgba(27,201,201,0.2)", color: "var(--blrd-gray-light)" }}
       >
         <strong style={{ color: "var(--blrd-amber)" }}>Submission Guidelines:</strong> Posts are reviewed by the BLRD team before publishing. Keep it respectful, original, and on-topic. No spam, hate speech, or plagiarism. We reserve the right to edit for clarity.
       </div>
@@ -412,8 +412,8 @@ export default function Blog() {
         <div
           className="mt-8 rounded p-6 text-center"
           style={{
-            background: "linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(8,10,15,1) 100%)",
-            border: "1px solid rgba(0,212,255,0.2)",
+            background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(0,0,0,1) 100%)",
+            border: "1px solid rgba(27,201,201,0.2)",
           }}
         >
           <h3 className="font-display font-bold mb-2 text-sm" style={{ color: "var(--blrd-white)" }}>

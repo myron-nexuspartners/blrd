@@ -23,7 +23,7 @@ const INQUIRY_TYPES = [
     id: "community",
     label: "Community Submissions",
     icon: <Users size={18} />,
-    color: "#b388ff",
+    color: "var(--blrd-cyan)",
     description: "Event submissions, creator spotlights, community news tips, and content suggestions.",
   },
   {
@@ -117,7 +117,7 @@ export default function Contact() {
         className="py-12 border-b"
         style={{
           borderColor: "var(--blrd-border)",
-          background: "linear-gradient(135deg, rgba(26,111,255,0.08) 0%, rgba(8,10,15,1) 60%)",
+          background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(0,0,0,1) 60%)",
         }}
       >
         <div className="container">
@@ -317,7 +317,7 @@ export default function Contact() {
                 </div>
                 <div className="flex justify-between">
                   <span>Community Submissions</span>
-                  <span style={{ color: "#b388ff" }}>3–5 business days</span>
+                  <span style={{ color: "var(--blrd-cyan)" }}>3–5 business days</span>
                 </div>
                 <div className="flex justify-between">
                   <span>General</span>
@@ -362,8 +362,8 @@ export default function Contact() {
             <div
               className="rounded p-4"
               style={{
-                background: "linear-gradient(135deg, rgba(255,179,0,0.08) 0%, rgba(8,10,15,1) 100%)",
-                border: "1px solid rgba(255,179,0,0.2)",
+                background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(0,0,0,1) 100%)",
+                border: "1px solid rgba(27,201,201,0.2)",
               }}
             >
               <h3 className="font-display text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "var(--blrd-amber)" }}>

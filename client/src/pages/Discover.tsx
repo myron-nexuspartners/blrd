@@ -109,7 +109,7 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 
 const TYPE_COLORS: Record<string, string> = {
   video: "var(--blrd-cyan)",
-  article: "#b388ff",
+  article: "var(--blrd-cyan)",
   podcast: "var(--blrd-amber)",
 };
 
@@ -144,7 +144,7 @@ export default function Discover() {
       <div
         className="relative py-12 overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, rgba(26,111,255,0.12) 0%, rgba(8,10,15,1) 50%, rgba(0,212,255,0.08) 100%)",
+          background: "linear-gradient(135deg, rgba(27,201,201,0.12) 0%, rgba(0,0,0,1) 50%, rgba(27,201,201,0.08) 100%)",
           borderBottom: "1px solid var(--blrd-border)",
         }}
       >
@@ -244,7 +244,7 @@ export default function Discover() {
                 onClick={() => setCatFilter(f.id)}
                 className="px-3 py-1.5 text-xs rounded border transition-all font-ui font-semibold"
                 style={{
-                  background: catFilter === f.id ? "rgba(0,212,255,0.15)" : "transparent",
+                  background: catFilter === f.id ? "rgba(27,201,201,0.15)" : "transparent",
                   borderColor: catFilter === f.id ? "var(--blrd-cyan)" : "var(--blrd-border)",
                   color: catFilter === f.id ? "var(--blrd-cyan)" : "var(--blrd-gray-light)",
                 }}
@@ -278,7 +278,7 @@ export default function Discover() {
                 <div
                   className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded text-xs font-ui font-semibold"
                   style={{
-                    background: "rgba(8,10,15,0.85)",
+                    background: "rgba(0,0,0,0.85)",
                     color: TYPE_COLORS[item.type],
                     border: `1px solid ${TYPE_COLORS[item.type]}44`,
                   }}
@@ -289,7 +289,7 @@ export default function Discover() {
                 {/* Sponsored badge */}
                 <div
                   className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-ui"
-                  style={{ background: "rgba(8,10,15,0.85)", color: "var(--blrd-amber)" }}
+                  style={{ background: "rgba(0,0,0,0.85)", color: "var(--blrd-amber)" }}
                 >
                   ★ Sponsored
                 </div>
@@ -333,8 +333,8 @@ export default function Discover() {
         <div
           className="mt-10 rounded p-8 text-center"
           style={{
-            background: "linear-gradient(135deg, rgba(255,179,0,0.08) 0%, rgba(255,107,0,0.05) 100%)",
-            border: "1px solid rgba(255,179,0,0.2)",
+            background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(255,87,34,0.05) 100%)",
+            border: "1px solid rgba(27,201,201,0.2)",
           }}
         >
           <h2 className="font-display font-bold mb-3" style={{ color: "var(--blrd-amber)", fontSize: "1.1rem" }}>

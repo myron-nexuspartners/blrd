@@ -91,7 +91,7 @@ export default function Layout({ children, showSidebar = true }: LayoutProps) {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/blrd-logo_b5e87130.png"
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/blrd-logo-v2-dNRtYTxVjhFZRJSFQS6Lyw.webp"
                 alt="BLRD Vision Entertainment"
                 className="h-8 w-auto"
               />
@@ -151,7 +151,7 @@ export default function Layout({ children, showSidebar = true }: LayoutProps) {
                   style={{
                     background: "var(--blrd-cyan)",
                     color: "var(--blrd-black)",
-                    letterSpacing: "0.08em",
+                    letterSpacing: "0.12em",
                   }}
                 >
                   Sign In / Join
@@ -195,7 +195,7 @@ export default function Layout({ children, showSidebar = true }: LayoutProps) {
                 <Button
                   size="sm"
                   onClick={() => toast.info("Search feature coming soon!")}
-                  style={{ background: "var(--blrd-cyan)", color: "var(--blrd-black)" }}
+                  style={{ background: "var(--blrd-cyan)", color: "var(--blrd-black)", fontWeight: 800 }}
                 >
                   Go
                 </Button>
@@ -257,7 +257,7 @@ export default function Layout({ children, showSidebar = true }: LayoutProps) {
             {/* Brand */}
             <div className="md:col-span-1">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/blrd-logo_b5e87130.png"
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/blrd-logo-v2-dNRtYTxVjhFZRJSFQS6Lyw.webp"
                 alt="BLRD"
                 className="h-10 w-auto mb-3"
               />

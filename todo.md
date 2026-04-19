@@ -80,3 +80,13 @@
 - [ ] Social sharing buttons
 - [ ] Dark/light theme toggle
 - [ ] SEO meta tags per page
+
+## Brand Update v2 (Style Guide Compliance)
+- [x] Regenerate BLRD logo matching style guide: "b" symbol with flame/eye, BLRD wordmark, Metropolis font
+- [x] Generate favicon matching style guide "b" symbol
+- [x] Update CSS: Primary Cyan #1BC9C9, Accent Orange #FF5722, Black #000000, White #FFFFFF
+- [x] Switch typography to Metropolis font (Bold + Light weights)
+- [x] Update all tag/accent colors to use brand-compliant palette
+- [x] Update Layout.tsx with new logo CDN URL
+- [x] Update favicon in client/public/favicon.ico
+- [x] Apply brand colors across all 8 pages

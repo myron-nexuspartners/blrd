@@ -187,7 +187,7 @@ function EventModal({ event, onClose }: { event: typeof EVENTS_DATA[0]; onClose:
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(8,10,15,0.92)" }}
+      style={{ background: "rgba(0,0,0,0.92)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
@@ -199,12 +199,12 @@ function EventModal({ event, onClose }: { event: typeof EVENTS_DATA[0]; onClose:
           <img src={event.image} alt={event.name} className="w-full h-full object-cover" />
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(8,10,15,0.9) 0%, transparent 60%)" }}
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)" }}
           />
           <button
             onClick={onClose}
             className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold"
-            style={{ background: "rgba(8,10,15,0.7)", color: "var(--blrd-white)" }}
+            style={{ background: "rgba(0,0,0,0.7)", color: "var(--blrd-white)" }}
           >
             ✕
           </button>
@@ -323,7 +323,7 @@ export default function Events() {
       {/* Header */}
       <div
         className="py-12 border-b"
-        style={{ borderColor: "var(--blrd-border)", background: "linear-gradient(135deg, rgba(0,230,118,0.06) 0%, rgba(8,10,15,1) 60%)" }}
+        style={{ borderColor: "var(--blrd-border)", background: "linear-gradient(135deg, rgba(0,230,118,0.06) 0%, rgba(0,0,0,1) 60%)" }}
       >
         <div className="container">
           <span className="blrd-tag blrd-tag-events mb-3 inline-block">Events</span>
@@ -371,7 +371,7 @@ export default function Events() {
               onClick={() => setCatFilter("all")}
               className="px-3 py-1.5 text-xs rounded border transition-all font-ui font-semibold"
               style={{
-                background: catFilter === "all" ? "rgba(0,212,255,0.15)" : "transparent",
+                background: catFilter === "all" ? "rgba(27,201,201,0.15)" : "transparent",
                 borderColor: catFilter === "all" ? "var(--blrd-cyan)" : "var(--blrd-border)",
                 color: catFilter === "all" ? "var(--blrd-cyan)" : "var(--blrd-gray-light)",
               }}
@@ -384,7 +384,7 @@ export default function Events() {
                 onClick={() => setCatFilter(c)}
                 className="px-3 py-1.5 text-xs rounded border transition-all font-ui font-semibold"
                 style={{
-                  background: catFilter === c ? "rgba(0,212,255,0.15)" : "transparent",
+                  background: catFilter === c ? "rgba(27,201,201,0.15)" : "transparent",
                   borderColor: catFilter === c ? "var(--blrd-cyan)" : "var(--blrd-border)",
                   color: catFilter === c ? "var(--blrd-cyan)" : "var(--blrd-gray-light)",
                 }}
@@ -434,7 +434,7 @@ export default function Events() {
                   />
                   <div
                     className="absolute inset-0"
-                    style={{ background: "linear-gradient(to top, rgba(8,10,15,0.85) 0%, transparent 60%)" }}
+                    style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%)" }}
                   />
                   <div className="absolute top-2 left-2 flex gap-1">
                     <span className={`blrd-tag blrd-tag-${event.category}`}>{CAT_LABELS[event.category]}</span>

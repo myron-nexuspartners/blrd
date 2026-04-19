@@ -260,7 +260,7 @@ function ReviewCard({ review, onSelect }: { review: typeof REVIEWS_DATA[0]; onSe
         />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(8,10,15,0.9) 0%, transparent 60%)" }}
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)" }}
         />
         <div className="absolute bottom-3 left-3">
           <FlameRating rating={review.blrdRating} size="md" />
@@ -328,7 +328,7 @@ function ReviewModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(8,10,15,0.92)" }}
+      style={{ background: "rgba(0,0,0,0.92)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
@@ -340,12 +340,12 @@ function ReviewModal({
           <img src={review.image} alt={review.title} className="w-full h-full object-cover" />
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(8,10,15,0.95) 0%, rgba(8,10,15,0.4) 60%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)" }}
           />
           <button
             onClick={onClose}
             className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-colors hover:bg-white/20"
-            style={{ background: "rgba(8,10,15,0.7)", color: "var(--blrd-white)" }}
+            style={{ background: "rgba(0,0,0,0.7)", color: "var(--blrd-white)" }}
           >
             ✕
           </button>
@@ -390,15 +390,15 @@ function ReviewModal({
 
           {/* Pros & Cons */}
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="rounded p-3" style={{ background: "rgba(0,212,255,0.05)", border: "1px solid rgba(0,212,255,0.15)" }}>
-              <div className="text-xs font-display font-bold mb-2" style={{ color: "var(--blrd-cyan)" }}>PROS</div>
+            <div className="rounded p-3" style={{ background: "rgba(27,201,201,0.05)", border: "1px solid rgba(27,201,201,0.15)" }}>
+              <div className="text-xs font-display font-bold mb-2" style={{ color: "var(--blrd-cyan)" }}>✓ PROS</div>
               {review.pros.map((p, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs mb-1" style={{ color: "var(--blrd-gray-light)" }}>
                   <span style={{ color: "var(--blrd-cyan)" }}>+</span> {p}
                 </div>
               ))}
             </div>
-            <div className="rounded p-3" style={{ background: "rgba(255,69,0,0.05)", border: "1px solid rgba(255,69,0,0.15)" }}>
+            <div className="rounded p-3" style={{ background: "rgba(255,87,34,0.05)", border: "1px solid rgba(255,87,34,0.15)" }}>
               <div className="text-xs font-display font-bold mb-2" style={{ color: "var(--blrd-flame)" }}>CONS</div>
               {review.cons.map((c, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs mb-1" style={{ color: "var(--blrd-gray-light)" }}>
@@ -411,9 +411,9 @@ function ReviewModal({
           {/* Verdict */}
           <div
             className="rounded p-4 mb-6"
-            style={{ background: "rgba(255,179,0,0.08)", border: "1px solid rgba(255,179,0,0.2)" }}
+            style={{ background: "rgba(27,201,201,0.06)", border: "1px solid rgba(27,201,201,0.2)" }}
           >
-            <div className="text-xs font-display font-bold mb-1 tracking-widest uppercase" style={{ color: "var(--blrd-amber)" }}>
+            <div className="text-xs font-display font-bold mb-1 tracking-widest uppercase" style={{ color: "var(--blrd-cyan)" }}>
               BLRD Verdict
             </div>
             <p className="text-sm font-semibold" style={{ color: "var(--blrd-white)", fontFamily: "Inter, sans-serif" }}>

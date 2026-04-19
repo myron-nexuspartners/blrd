@@ -23,7 +23,7 @@ const PILLARS = [
   },
   {
     icon: <Globe size={24} />,
-    color: "#b388ff",
+    color: "var(--blrd-cyan)",
     title: "Connecting Communities",
     body: "From Kansas City to everywhere, BLRD connects fans, creators, and brands across the full spectrum of geek culture. If you're passionate about it, you belong here.",
   },
@@ -35,7 +35,7 @@ const PILLARS = [
   },
   {
     icon: <Target size={24} />,
-    color: "#64ffda",
+    color: "var(--blrd-cyan)",
     title: "Innovation in Content",
     body: "BLRD is pioneering new approaches to geek culture media — from our custom Flames rating system to our Discover platform for premium creator content.",
   },
@@ -78,7 +78,7 @@ const TIMELINE = [
   {
     phase: "Scale",
     period: "Months 25–30",
-    color: "#b388ff",
+    color: "var(--blrd-cyan)",
     milestones: [
       "Launch mobile app",
       "Reach 200,000 social media followers",
@@ -95,7 +95,7 @@ export default function About() {
       <div
         className="relative py-20 overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(8,10,15,1) 50%, rgba(255,107,0,0.05) 100%)",
+          background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(0,0,0,1) 50%, rgba(255,87,34,0.05) 100%)",
           borderBottom: "1px solid var(--blrd-border)",
         }}
       >
@@ -239,8 +239,8 @@ export default function About() {
         <div
           className="rounded p-8 mb-16"
           style={{
-            background: "linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(255,107,0,0.05) 100%)",
-            border: "1px solid rgba(0,212,255,0.2)",
+            background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(255,87,34,0.05) 100%)",
+            border: "1px solid rgba(27,201,201,0.2)",
           }}
         >
           <div className="max-w-3xl mx-auto text-center">
@@ -319,7 +319,7 @@ export default function About() {
             {[
               { value: "$503B", label: "Global gaming market by 2025", color: "var(--blrd-cyan)" },
               { value: "45%", label: "Of all gamers are from diverse backgrounds", color: "var(--blrd-orange)" },
-              { value: "12M", label: "Addressable market in the US", color: "#b388ff" },
+              { value: "12M", label: "Addressable market in the US", color: "var(--blrd-cyan)" },
               { value: "$38.2B", label: "Digital content creation market by 2030", color: "var(--blrd-amber)" },
             ].map((stat) => (
               <div

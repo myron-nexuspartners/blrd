@@ -36,7 +36,7 @@ const HERO_SLIDES = [
     cta: "Watch Our Reviews",
     ctaHref: "/reviews",
     image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/hero-movies_9cbedcb0.jpg",
-    accent: "#b388ff",
+    accent: "var(--blrd-cyan)",
   },
   {
     id: 4,
@@ -168,7 +168,7 @@ const CATEGORY_SECTIONS = [
     ],
   },
   {
-    id: "tv", label: "TV", icon: <Tv size={14} />, color: "#64ffda",
+    id: "tv", label: "TV", icon: <Tv size={14} />, color: "var(--blrd-cyan)",
     articles: [
       { title: "The Last of Us Season 3: Everything We Know", tag: "tv" },
       { title: "Fallout Season 2 Renewal: What's Coming Next", tag: "tv" },
@@ -304,7 +304,7 @@ function HeroCarousel() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to right, rgba(8,10,15,0.95) 0%, rgba(8,10,15,0.7) 45%, rgba(8,10,15,0.2) 75%, transparent 100%)",
+            "linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.2) 75%, transparent 100%)",
           zIndex: 1,
         }}
       />
@@ -377,7 +377,7 @@ function HeroCarousel() {
       <button
         onClick={goPrev}
         className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all hover:scale-110"
-        style={{ background: "rgba(8,10,15,0.7)", color: "var(--blrd-white)", zIndex: 3 }}
+        style={{ background: "rgba(0,0,0,0.7)", color: "var(--blrd-white)", zIndex: 3 }}
         aria-label="Previous slide"
       >
         <ChevronLeft size={18} />
@@ -385,7 +385,7 @@ function HeroCarousel() {
       <button
         onClick={goNext}
         className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all hover:scale-110"
-        style={{ background: "rgba(8,10,15,0.7)", color: "var(--blrd-white)", zIndex: 3 }}
+        style={{ background: "rgba(0,0,0,0.7)", color: "var(--blrd-white)", zIndex: 3 }}
         aria-label="Next slide"
       >
         <ChevronRight size={18} />
@@ -495,8 +495,8 @@ export default function Home() {
             <div
               className="rounded p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4"
               style={{
-                background: "linear-gradient(135deg, rgba(0,212,255,0.1) 0%, rgba(26,111,255,0.1) 100%)",
-                border: "1px solid rgba(0,212,255,0.2)",
+                background: "linear-gradient(135deg, rgba(27,201,201,0.1) 0%, rgba(27,201,201,0.1) 100%)",
+                border: "1px solid rgba(27,201,201,0.2)",
               }}
             >
               <div>
