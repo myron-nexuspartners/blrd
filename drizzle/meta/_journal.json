@@ -15,6 +15,13 @@
       "when": 1774456337330,
       "tag": "0001_public_mesmero",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1776644504592,
+      "tag": "0002_cynical_sway",
+      "breakpoints": true
     }
   ]
 }

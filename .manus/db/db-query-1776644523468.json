@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `articles` ADD `vertical` enum('gaming','tv-streaming','music-movies','comics-cosplay-anime','technology-culture');\nALTER TABLE `articles` ADD `authorSlug` varchar(100);\nALTER TABLE `articles` ADD `citations` text;\nALTER TABLE `articles` ADD `source` enum('manual','pipeline') DEFAULT 'manual' NOT NULL;\nALTER TABLE `discover_items` ADD `vertical` enum('gaming','tv-streaming','music-movies','comics-cosplay-anime','technology-culture');\nALTER TABLE `reviews` ADD `vertical` enum('gaming','tv-streaming','music-movies','comics-cosplay-anime','technology-culture');\nALTER TABLE `reviews` ADD `authorSlug` varchar(100);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2NGB44gaH1TQE6r.root --database DEtMGVgfKVDqXRWzhEhATX --execute ALTER TABLE `articles` ADD `vertical` enum('gaming','tv-streaming','music-movies','comics-cosplay-anime','technology-culture');\nALTER TABLE `articles` ADD `authorSlug` varchar(100);\nALTER TABLE `articles` ADD `citations` text;\nALTER TABLE `articles` ADD `source` enum('manual','pipeline') DEFAULT 'manual' NOT NULL;\nALTER TABLE `discover_items` ADD `vertical` enum('gaming','tv-streaming','music-movies','comics-cosplay-anime','technology-culture');\nALTER TABLE `reviews` ADD `vertical` enum('gaming','tv-streaming','music-movies','comics-cosplay-anime','technology-culture');\nALTER TABLE `reviews` ADD `authorSlug` varchar(100);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1877
+}

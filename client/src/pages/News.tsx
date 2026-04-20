@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { Link, useSearch } from "wouter";
 import Layout from "@/components/Layout";
-import { Search, SlidersHorizontal, Clock, TrendingUp } from "lucide-react";
+import { Search, Clock, TrendingUp } from "lucide-react";
+import { Byline } from "@/components/Byline";
 
+// Primary categories (top-level nav)
 const CATEGORIES = [
   { id: "all", label: "All" },
   { id: "gaming", label: "Gaming" },
@@ -14,6 +16,35 @@ const CATEGORIES = [
   { id: "events", label: "Events" },
   { id: "creators", label: "Creators" },
 ];
+
+// 5 content verticals (subcategories per architecture doc)
+const VERTICALS = [
+  { id: "all", label: "All Verticals" },
+  { id: "gaming", label: "Gaming", color: "#1BC9C9" },
+  { id: "tv-streaming", label: "TV / Streaming", color: "#a855f7" },
+  { id: "music-movies", label: "Music & Movies", color: "#FF5722" },
+  { id: "comics-cosplay-anime", label: "Comics, Cosplay & Anime", color: "#eab308" },
+  { id: "technology-culture", label: "Technology & Culture", color: "#22c55e" },
+];
+
+// Map vertical → article category for filtering
+const VERTICAL_TO_CATEGORY: Record<string, string[]> = {
+  "gaming": ["gaming"],
+  "tv-streaming": ["tv"],
+  "music-movies": ["film"],
+  "comics-cosplay-anime": ["comics", "culture"],
+  "technology-culture": ["tech", "culture"],
+};
+
+// Map article author to beat writer slug for bylines
+const AUTHOR_SLUG_MAP: Record<string, string> = {
+  "Marcus Webb": "kai-reeves",
+  "Keisha Daniels": "noor-bensalem",
+  "Jordan Price": "sol-carter",
+  "Tanya Rivers": "amara-desta",
+  "Devon Clarke": "taye-adeyemi",
+  "Simone Hart": "noor-bensalem",
+};
 
 const SORT_OPTIONS = [
   { id: "latest", label: "Latest", icon: <Clock size={12} /> },
@@ -170,9 +201,13 @@ function ArticleCard({ article, large = false }: { article: typeof ALL_ARTICLES[
             <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--blrd-gray)" }}>
               {article.subhead}
             </p>
-            <div className="flex items-center gap-3 text-xs" style={{ color: "var(--blrd-gray)" }}>
-              <span className="font-ui">By {article.author}</span>
-              <span>💬 {article.comments}</span>
+            <div className="flex items-center justify-between gap-3">
+              <Byline
+                authorName={article.author}
+                authorSlug={AUTHOR_SLUG_MAP[article.author]}
+                compact
+              />
+              <span className="text-xs" style={{ color: "var(--blrd-gray)" }}>💬 {article.comments}</span>
             </div>
           </div>
         </div>
@@ -201,10 +236,13 @@ function ArticleCard({ article, large = false }: { article: typeof ALL_ARTICLES[
           >
             {article.title}
           </h3>
-          <div className="flex items-center gap-3 text-xs" style={{ color: "var(--blrd-gray)" }}>
-            <span className="font-ui">{article.author}</span>
-            <span>💬 {article.comments}</span>
-            <span className="ml-auto">{article.readTime}</span>
+          <div className="flex items-center justify-between gap-2">
+            <Byline
+              authorName={article.author}
+              authorSlug={AUTHOR_SLUG_MAP[article.author]}
+              compact
+            />
+            <span className="text-xs shrink-0" style={{ color: "var(--blrd-gray)" }}>{article.readTime}</span>
           </div>
         </div>
       </div>
@@ -221,10 +259,17 @@ export default function News() {
   const [sortBy, setSortBy] = useState("latest");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [activeVertical, setActiveVertical] = useState("all");
+
   const filtered = useMemo(() => {
     let list = [...ALL_ARTICLES];
     if (activeCategory !== "all") {
       list = list.filter((a) => a.category === activeCategory);
+    }
+    // Vertical sub-filter
+    if (activeVertical !== "all") {
+      const allowedCategories = VERTICAL_TO_CATEGORY[activeVertical] ?? [];
+      list = list.filter((a) => allowedCategories.includes(a.category));
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -292,6 +337,29 @@ export default function News() {
             >
               {opt.icon}
               {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Vertical Subcategory Filters */}
+      <div className="mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--blrd-gray)" }}>Vertical</span>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {VERTICALS.map((v) => (
+            <button
+              key={v.id}
+              onClick={() => setActiveVertical(v.id)}
+              className="px-3 py-1 text-xs rounded-full border transition-all font-ui font-semibold tracking-wide"
+              style={{
+                background: activeVertical === v.id ? (v.color ?? "var(--blrd-cyan)") : "transparent",
+                borderColor: activeVertical === v.id ? (v.color ?? "var(--blrd-cyan)") : "var(--blrd-border)",
+                color: activeVertical === v.id ? "#000" : "var(--blrd-gray-light)",
+              }}
+            >
+              {v.label}
             </button>
           ))}
         </div>

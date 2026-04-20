@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `pipeline_tokens` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`token` varchar(128) NOT NULL,\n\t`label` varchar(255) NOT NULL,\n\t`isActive` boolean NOT NULL DEFAULT true,\n\t`lastUsedAt` timestamp,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `pipeline_tokens_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `pipeline_tokens_token_unique` UNIQUE(`token`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2NGB44gaH1TQE6r.root --database DEtMGVgfKVDqXRWzhEhATX --execute CREATE TABLE `pipeline_tokens` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`token` varchar(128) NOT NULL,\n\t`label` varchar(255) NOT NULL,\n\t`isActive` boolean NOT NULL DEFAULT true,\n\t`lastUsedAt` timestamp,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `pipeline_tokens_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `pipeline_tokens_token_unique` UNIQUE(`token`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 138
+}

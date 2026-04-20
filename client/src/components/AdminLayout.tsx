@@ -11,6 +11,8 @@ import {
   Menu,
   Shield,
   Star,
+  Users,
+  Zap,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -24,6 +26,8 @@ const NAV_ITEMS = [
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/contacts", label: "Contacts", icon: Inbox },
+  { href: "/admin/authors", label: "Beat Writers", icon: Users },
+  { href: "/admin/pipeline", label: "Pipeline", icon: Zap },
 ];
 
 function NavItem({

@@ -101,3 +101,16 @@
 - [x] Event management: add new event, edit existing, delete, all sortable fields
 - [x] Wire /admin routes in App.tsx with adminOnly guard
 - [x] Write vitest tests for admin procedures
+
+## v4 — Verticals, Author Profiles & Pipeline API
+- [x] Update DB schema: authors table, article_verticals enum, pipeline_api_tokens table
+- [x] Seed 5 beat writer author profiles (Kai, Amara, Sol, Noor, Taye)
+- [x] Build author profile pages (/authors and /authors/:slug)
+- [x] Add byline component with author name, vertical, date, and citation block
+- [x] Update News page: 5 verticals as subcategory filter tags
+- [x] Update Discover page: 5 verticals as subcategory filter tags
+- [x] Update Reviews page: align categories to verticals
+- [x] Build REST API endpoint for Python pipeline article ingestion (/api/pipeline/articles)
+- [x] Update Admin: author management module
+- [x] Update Admin: pipeline article queue (draft articles from API)
+- [x] Write vitest tests for new procedures

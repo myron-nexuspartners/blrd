@@ -18,6 +18,10 @@ import AdminBlog from "./pages/admin/AdminBlog";
 import AdminReviews from "./pages/admin/AdminReviews";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminContacts from "./pages/admin/AdminContacts";
+import AdminAuthors from "./pages/admin/AdminAuthors";
+import AdminPipeline from "./pages/admin/AdminPipeline";
+// Author pages
+import { AuthorsPage, AuthorProfilePage } from "./pages/Authors";
 
 function Router() {
   return (
@@ -37,6 +41,11 @@ function Router() {
       <Route path="/admin/reviews" component={AdminReviews} />
       <Route path="/admin/events" component={AdminEvents} />
       <Route path="/admin/contacts" component={AdminContacts} />
+      <Route path="/admin/authors" component={AdminAuthors} />
+      <Route path="/admin/pipeline" component={AdminPipeline} />
+      {/* Author pages */}
+      <Route path="/authors" component={AuthorsPage} />
+      <Route path="/authors/:slug" component={AuthorProfilePage} />
       {/* Fallback */}
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

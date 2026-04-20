@@ -8,6 +8,8 @@ import { eq, and, sql } from "drizzle-orm";
 import { z } from "zod/v4";
 import { notifyOwner } from "./_core/notification";
 import { adminRouter } from "./routers/admin";
+import { authorsRouter } from "./routers/authors";
+import { pipelineRouter } from "./routers/pipeline";
 
 export const appRouter = router({
   system: systemRouter,
@@ -22,6 +24,12 @@ export const appRouter = router({
 
   // ─── Admin ───────────────────────────────────────────────────────────────
   admin: adminRouter,
+
+  // ─── Authors ─────────────────────────────────────────────────────────────
+  authors: authorsRouter,
+
+  // ─── Pipeline ────────────────────────────────────────────────────────────
+  pipeline: pipelineRouter,
 
   // ─── Reviews ────────────────────────────────────────────────────────────
   reviews: router({
