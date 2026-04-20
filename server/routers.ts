@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
 import { contactSubmissions, userRatings, events, articles } from "../drizzle/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, desc, inArray } from "drizzle-orm";
 import { z } from "zod/v4";
 import { notifyOwner } from "./_core/notification";
 import { adminRouter } from "./routers/admin";
@@ -87,6 +87,51 @@ export const appRouter = router({
 
         return { success: true };
       }),
+  }),
+
+  // ─── Articles (public queries) ────────────────────────────────────────────
+  articles: router({
+    // Returns the single most-recent published article for each of the 5 verticals
+    latestByVertical: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+
+      const verticals = [
+        "gaming",
+        "tv-streaming",
+        "music-movies",
+        "comics-cosplay-anime",
+        "technology-culture",
+      ] as const;
+
+      // Fetch the 3 most-recent published articles per vertical in one query,
+      // then pick the newest per vertical in JS (avoids complex subquery).
+      const rows = await db
+        .select()
+        .from(articles)
+        .where(
+          and(
+            eq(articles.status, "published"),
+            inArray(articles.vertical, [...verticals])
+          )
+        )
+        .orderBy(desc(articles.publishedAt))
+        .limit(25);
+
+      // Deduplicate: keep only the first (newest) article per vertical
+      const seen = new Set<string>();
+      const result: typeof rows = [];
+      for (const row of rows) {
+        if (row.vertical && !seen.has(row.vertical)) {
+          seen.add(row.vertical);
+          result.push(row);
+        }
+        if (result.length === verticals.length) break;
+      }
+
+      // Ensure all 5 verticals are represented (fill missing with null placeholders)
+      return verticals.map((v) => result.find((r) => r.vertical === v) ?? null);
+    }),
   }),
 
   // ─── Blog / Articles ─────────────────────────────────────────────────────

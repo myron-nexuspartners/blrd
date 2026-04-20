@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { Link } from "wouter";
-import { Flame, Users, Zap, Globe, Star, Target } from "lucide-react";
+import { Flame, Users, Zap, Globe, Star, Target, Trophy, Rocket, TrendingUp, MapPin } from "lucide-react";
 
 const PILLARS = [
   {
@@ -43,47 +43,78 @@ const PILLARS = [
 
 const TIMELINE = [
   {
-    phase: "Foundation",
-    period: "Months 1–6",
+    phase: "Launch",
+    period: "Q2 2026 — Now",
     color: "var(--blrd-cyan)",
+    status: "active",
+    icon: "rocket",
     milestones: [
-      "Launch website and core social media presence",
-      "Establish editorial calendar and content workflow",
-      "Publish first 50 pieces of content",
-      "Reach 5,000 social media followers",
+      "Site live: all 8 content verticals publishing daily",
+      "AI-powered content pipeline operational (10–12 articles/day)",
+      "5 beat writer personas active across all verticals",
+      "Seed audience: 5,000 social media followers across platforms",
+      "First ad revenue: direct brand partnerships + programmatic",
+      "Community features live: ratings, blog submissions, events",
     ],
   },
   {
-    phase: "Growth",
-    period: "Months 7–12",
+    phase: "Momentum",
+    period: "Q3–Q4 2026",
     color: "var(--blrd-amber)",
+    status: "upcoming",
+    icon: "trending",
     milestones: [
-      "Launch premium subscription service",
       "Reach 25,000 social media followers",
-      "Generate first $10,000 in monthly revenue",
-      "Attend first major convention as exhibitor",
-    ],
-  },
-  {
-    phase: "Expansion",
-    period: "Months 13–18",
-    color: "var(--blrd-orange)",
-    milestones: [
-      "Achieve break-even point",
-      "Launch live streaming and podcast series",
-      "Reach 50,000 social media followers",
-      "Expand team to 8 full-time employees",
+      "$15,000+ monthly recurring revenue (ads + sponsorships)",
+      "Launch BLRD Podcast Network — one show per vertical",
+      "First live event presence: The Game Awards 2026 (Los Angeles)",
+      "Discover platform: 10+ active brand/creator sponsorships",
+      "Break-even achieved; first month of net profit",
     ],
   },
   {
     phase: "Scale",
-    period: "Months 25–30",
-    color: "var(--blrd-cyan)",
+    period: "Q1–Q2 2027",
+    color: "var(--blrd-orange)",
+    status: "upcoming",
+    icon: "trophy",
+    events: [
+      { name: "CES 2027", location: "Las Vegas, NV", month: "Jan 2027" },
+      { name: "SXSW 2027", location: "Austin, TX", month: "Mar 2027" },
+      { name: "BlerdCon 2027", location: "Washington, D.C.", month: "Jul 2027" },
+    ],
     milestones: [
-      "Launch mobile app",
-      "Reach 200,000 social media followers",
-      "Establish corporate training and consulting division",
-      "Achieve industry award recognition",
+      "100,000+ social media followers across all platforms",
+      "$50,000+ monthly revenue; consistent profitability",
+      "Expand team to 8 full-time staff + 15 contributing creators",
+      "Booth presence at CES 2027 — Technology & Culture vertical launch",
+      "Booth presence at SXSW 2027 — Creator Economy & Music/Movies",
+      "Anchor booth at BlerdCon 2027 — flagship community event",
+      "Launch BLRD Premium subscription tier",
+      "US eSports circuit coverage: LCS, CDL, Valorant Champions",
+    ],
+  },
+  {
+    phase: "Expansion",
+    period: "Q3–Q4 2027",
+    color: "var(--blrd-cyan)",
+    status: "upcoming",
+    icon: "globe",
+    events: [
+      { name: "San Diego Comic-Con", location: "San Diego, CA", month: "Jul 2027" },
+      { name: "New York Comic Con", location: "New York, NY", month: "Oct 2027" },
+      { name: "KC Comic Con", location: "Kansas City, MO", month: "Sep 2027" },
+      { name: "The Game Awards 2027", location: "Los Angeles, CA", month: "Dec 2027" },
+    ],
+    milestones: [
+      "250,000+ social media followers; 500K monthly unique visitors",
+      "$100,000+ monthly revenue; $1M+ ARR milestone",
+      "Booth presence at San Diego Comic-Con, NYCC, and KC Comic Con",
+      "International expansion: UK eSports coverage (ESL UK, Belong)",
+      "LatAm market entry: Brasil Game Show + LLA eSports partnerships",
+      "BLRD Awards debut at The Game Awards 2027 activation",
+      "Mobile app launch: iOS + Android",
+      "Series A fundraising or strategic partnership secured",
     ],
   },
 ];
@@ -280,33 +311,163 @@ export default function About() {
         {/* Roadmap */}
         <div className="mb-16">
           <div className="section-header">
-            <h2>Our Roadmap</h2>
+            <Rocket size={14} style={{ color: "var(--blrd-cyan)" }} />
+            <h2>Growth Roadmap</h2>
+            <span className="ml-auto text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>
+              April 2026 — December 2027
+            </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {TIMELINE.map((phase) => (
-              <div
-                key={phase.phase}
-                className="blrd-card p-5"
-                style={{ borderTop: `3px solid ${phase.color}` }}
+
+          {/* Timeline connector line (desktop) */}
+          <div className="relative">
+            <div
+              className="hidden lg:block absolute top-8 left-0 right-0 h-px"
+              style={{ background: "linear-gradient(to right, var(--blrd-cyan), var(--blrd-amber), var(--blrd-orange), var(--blrd-cyan))", opacity: 0.3, zIndex: 0 }}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative" style={{ zIndex: 1 }}>
+              {TIMELINE.map((phase) => {
+                const phaseIcon = phase.icon === "rocket" ? <Rocket size={16} />
+                  : phase.icon === "trending" ? <TrendingUp size={16} />
+                  : phase.icon === "trophy" ? <Trophy size={16} />
+                  : <Globe size={16} />;
+
+                return (
+                  <div
+                    key={phase.phase}
+                    className="blrd-card p-5 flex flex-col gap-3"
+                    style={{
+                      borderTop: `3px solid ${phase.color}`,
+                      boxShadow: phase.status === "active" ? `0 0 20px ${phase.color}22` : undefined,
+                    }}
+                  >
+                    {/* Phase header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span style={{ color: phase.color }}>{phaseIcon}</span>
+                          <h3 className="font-display text-sm font-bold" style={{ color: phase.color }}>
+                            {phase.phase}
+                          </h3>
+                        </div>
+                        <span className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>
+                          {phase.period}
+                        </span>
+                      </div>
+                      {phase.status === "active" && (
+                        <span
+                          className="text-xs font-display font-bold px-2 py-0.5 rounded-full shrink-0"
+                          style={{
+                            background: "rgba(27,201,201,0.15)",
+                            color: "var(--blrd-cyan)",
+                            border: "1px solid rgba(27,201,201,0.3)",
+                            letterSpacing: "0.08em",
+                          }}
+                        >
+                          LIVE
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Event signposts */}
+                    {"events" in phase && phase.events && phase.events.length > 0 && (
+                      <div
+                        className="rounded p-3"
+                        style={{ background: "rgba(255,87,34,0.06)", border: "1px solid rgba(255,87,34,0.15)" }}
+                      >
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <MapPin size={11} style={{ color: "var(--blrd-orange)" }} />
+                          <span
+                            className="text-xs font-display font-bold uppercase tracking-wider"
+                            style={{ color: "var(--blrd-orange)" }}
+                          >
+                            Event Presence
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          {phase.events.map((ev: { name: string; location: string; month: string }) => (
+                            <div key={ev.name} className="flex items-start justify-between gap-1">
+                              <span className="text-xs font-semibold" style={{ color: "var(--blrd-white)", fontFamily: "Inter, sans-serif" }}>
+                                {ev.name}
+                              </span>
+                              <span className="text-xs shrink-0" style={{ color: "var(--blrd-gray)" }}>
+                                {ev.month}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Milestones */}
+                    <ul className="flex flex-col gap-2">
+                      {phase.milestones.map((m, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--blrd-gray-light)" }}>
+                          <span style={{ color: phase.color, marginTop: "2px", flexShrink: 0 }}>▸</span>
+                          {m}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Event calendar strip */}
+          <div
+            className="mt-6 rounded p-5"
+            style={{ background: "var(--blrd-dark-2)", border: "1px solid var(--blrd-border)" }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy size={14} style={{ color: "var(--blrd-amber)" }} />
+              <h3
+                className="font-display text-xs font-bold uppercase tracking-widest"
+                style={{ color: "var(--blrd-amber)" }}
               >
-                <div className="mb-3">
-                  <h3 className="font-display text-sm font-bold" style={{ color: phase.color }}>
-                    {phase.phase}
-                  </h3>
-                  <span className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>
-                    {phase.period}
-                  </span>
+                Confirmed Event Targets 2026–2027
+              </h3>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { name: "The Game Awards", location: "Los Angeles, CA", date: "Dec 2026", tag: "gaming", region: "US" },
+                { name: "CES 2027", location: "Las Vegas, NV", date: "Jan 2027", tag: "tech", region: "US" },
+                { name: "SXSW 2027", location: "Austin, TX", date: "Mar 2027", tag: "culture", region: "US" },
+                { name: "BlerdCon 2027", location: "Washington, D.C.", date: "Jul 2027", tag: "creators", region: "US" },
+                { name: "San Diego Comic-Con", location: "San Diego, CA", date: "Jul 2027", tag: "comics", region: "US" },
+                { name: "KC Comic Con", location: "Kansas City, MO", date: "Sep 2027", tag: "comics", region: "US" },
+                { name: "New York Comic Con", location: "New York, NY", date: "Oct 2027", tag: "comics", region: "US" },
+                { name: "ESL UK Major", location: "London, UK", date: "TBD 2027", tag: "gaming", region: "UK" },
+                { name: "Brasil Game Show", location: "São Paulo, BR", date: "Oct 2027", tag: "gaming", region: "LatAm" },
+                { name: "LLA eSports Finals", location: "Mexico City, MX", date: "TBD 2027", tag: "gaming", region: "LatAm" },
+                { name: "The Game Awards 2027", location: "Los Angeles, CA", date: "Dec 2027", tag: "gaming", region: "US" },
+                { name: "Valorant Champions", location: "US Tour", date: "2027", tag: "gaming", region: "US" },
+              ].map((ev) => (
+                <div
+                  key={ev.name + ev.date}
+                  className="rounded p-3"
+                  style={{ background: "var(--blrd-dark-3)", border: "1px solid var(--blrd-border)" }}
+                >
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span className={`blrd-tag blrd-tag-${ev.tag}`} style={{ fontSize: "0.55rem" }}>
+                      {ev.region}
+                    </span>
+                    <span className="text-xs" style={{ color: "var(--blrd-gray)", fontSize: "0.6rem" }}>
+                      {ev.date}
+                    </span>
+                  </div>
+                  <p
+                    className="text-xs font-semibold leading-tight"
+                    style={{ color: "var(--blrd-white)", fontFamily: "Inter, sans-serif" }}
+                  >
+                    {ev.name}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--blrd-gray)", fontSize: "0.6rem" }}>
+                    {ev.location}
+                  </p>
                 </div>
-                <ul className="flex flex-col gap-2">
-                  {phase.milestones.map((m, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--blrd-gray-light)" }}>
-                      <span style={{ color: phase.color, marginTop: "2px" }}>▸</span>
-                      {m}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 

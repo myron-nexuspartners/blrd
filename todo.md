@@ -114,3 +114,14 @@
 - [x] Update Admin: author management module
 - [x] Update Admin: pipeline article queue (draft articles from API)
 - [x] Write vitest tests for new procedures
+
+## v5 — Latest by Vertical (Homepage)
+- [ ] Add tRPC procedure: articles.latestByVertical — returns newest article per vertical
+- [ ] Build LatestByVertical section component on Home page
+- [ ] Seed at least one article per vertical for demo content
+- [ ] Write vitest test for latestByVertical procedure
+
+## v6 — Roadmap & Milestones Update
+- [x] Rewrite About page roadmap: accelerated growth/revenue/profit milestones anchored to April 2027 scaling goal
+- [x] Add event presence signposts: BlerdCon 2027, CES 2027, SXSW, Comic-Con KC/NY/SD, The Game Awards, US/UK/LatAm eSports
+- [x] Align milestone phases to current date (April 2026) through end of 2027

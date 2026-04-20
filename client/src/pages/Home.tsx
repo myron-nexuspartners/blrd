@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import Layout from "@/components/Layout";
-import { ChevronLeft, ChevronRight, Flame, Play, BookOpen, Tv, Gamepad2, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Flame, Play, BookOpen, Tv, Gamepad2, Users, Zap, Music, Cpu } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 // ─── Hero Banner Data ──────────────────────────────────────────────────────
 const HERO_SLIDES = [
@@ -187,7 +188,184 @@ const CATEGORY_SECTIONS = [
   },
 ];
 
-// ─── Flame Rating Display ─────────────────────────────────────────────────
+// ─── Vertical config ───────────────────────────────────────────────────
+const VERTICALS = [
+  { id: "gaming",               label: "Gaming",               color: "var(--blrd-cyan)",   icon: <Gamepad2 size={14} />,  href: "/news?vertical=gaming" },
+  { id: "tv-streaming",         label: "TV & Streaming",        color: "var(--blrd-orange)", icon: <Tv size={14} />,        href: "/news?vertical=tv-streaming" },
+  { id: "music-movies",         label: "Music & Movies",        color: "var(--blrd-flame)",  icon: <Music size={14} />,     href: "/news?vertical=music-movies" },
+  { id: "comics-cosplay-anime", label: "Comics, Cosplay & Anime", color: "var(--blrd-cyan)", icon: <BookOpen size={14} />,  href: "/news?vertical=comics-cosplay-anime" },
+  { id: "technology-culture",   label: "Technology & Culture",  color: "var(--blrd-orange)", icon: <Cpu size={14} />,       href: "/news?vertical=technology-culture" },
+] as const;
+
+type VerticalId = typeof VERTICALS[number]["id"];
+
+// ─── Latest by Vertical Section ─────────────────────────────────────────────────
+function LatestByVertical() {
+  const { data, isLoading } = trpc.articles.latestByVertical.useQuery();
+
+  // Skeleton placeholder while loading
+  if (isLoading) {
+    return (
+      <div className="mb-8">
+        <div className="section-header">
+          <Zap size={14} style={{ color: "var(--blrd-cyan)" }} />
+          <h2 style={{ color: "var(--blrd-cyan)" }}>Latest by Vertical</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {VERTICALS.map((v) => (
+            <div
+              key={v.id}
+              className="blrd-card p-4 animate-pulse"
+              style={{ minHeight: 140, borderTop: `3px solid ${v.color}` }}
+            >
+              <div className="h-3 rounded mb-2" style={{ background: "var(--blrd-dark-3)", width: "40%" }} />
+              <div className="h-4 rounded mb-1" style={{ background: "var(--blrd-dark-3)", width: "90%" }} />
+              <div className="h-3 rounded" style={{ background: "var(--blrd-dark-3)", width: "70%" }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8">
+      <div className="section-header">
+        <Zap size={14} style={{ color: "var(--blrd-cyan)" }} />
+        <h2 style={{ color: "var(--blrd-cyan)" }}>Latest by Vertical</h2>
+        <Link href="/news">
+          <span
+            className="ml-auto text-xs font-ui transition-colors hover:text-white"
+            style={{ color: "var(--blrd-gray)" }}
+          >
+            View All News →
+          </span>
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        {VERTICALS.map((v, i) => {
+          const article = data?.[i] ?? null;
+          const cfg = v;
+
+          if (!article) {
+            // Empty state card — vertical exists but no published article yet
+            return (
+              <Link key={v.id} href={cfg.href}>
+                <div
+                  className="blrd-card p-4 group cursor-pointer flex flex-col justify-between"
+                  style={{ minHeight: 140, borderTop: `3px solid ${cfg.color}` }}
+                >
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span style={{ color: cfg.color }}>{cfg.icon}</span>
+                      <span
+                        className="text-xs font-display font-bold uppercase tracking-wider"
+                        style={{ color: cfg.color }}
+                      >
+                        {cfg.label}
+                      </span>
+                    </div>
+                    <p className="text-xs italic" style={{ color: "var(--blrd-gray)" }}>
+                      No articles yet. Check back soon.
+                    </p>
+                  </div>
+                  <span
+                    className="text-xs font-ui mt-3 transition-colors group-hover:text-white"
+                    style={{ color: cfg.color }}
+                  >
+                    Explore {cfg.label} →
+                  </span>
+                </div>
+              </Link>
+            );
+          }
+
+          const publishedDate = article.publishedAt
+            ? new Date(article.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+            : "";
+
+          return (
+            <Link key={v.id} href={`/news/${article.slug}`}>
+              <div
+                className="blrd-card p-4 group cursor-pointer flex flex-col justify-between"
+                style={{ minHeight: 140, borderTop: `3px solid ${cfg.color}` }}
+              >
+                {/* Thumbnail if available */}
+                {article.imageUrl && (
+                  <div className="w-full h-24 rounded overflow-hidden mb-3 -mx-0">
+                    <img
+                      src={article.imageUrl}
+                      alt={article.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                )}
+
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span style={{ color: cfg.color }}>{cfg.icon}</span>
+                    <span
+                      className="text-xs font-display font-bold uppercase tracking-wider"
+                      style={{ color: cfg.color }}
+                    >
+                      {cfg.label}
+                    </span>
+                    {publishedDate && (
+                      <span className="ml-auto text-xs" style={{ color: "var(--blrd-gray)" }}>
+                        {publishedDate}
+                      </span>
+                    )}
+                  </div>
+
+                  <h4
+                    className="text-sm font-semibold leading-snug line-clamp-3 transition-colors group-hover:text-cyan-400"
+                    style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
+                  >
+                    {article.title}
+                  </h4>
+
+                  {article.subhead && (
+                    <p
+                      className="text-xs mt-1 line-clamp-2"
+                      style={{ color: "var(--blrd-gray)" }}
+                    >
+                      {article.subhead}
+                    </p>
+                  )}
+
+                  {article.authorName && (
+                    <p className="text-xs mt-2" style={{ color: "var(--blrd-gray)" }}>
+                      By{" "}
+                      {article.authorSlug ? (
+                        <Link href={`/authors/${article.authorSlug}`}>
+                          <span className="transition-colors hover:text-cyan-400" style={{ color: cfg.color }}>
+                            {article.authorName}
+                          </span>
+                        </Link>
+                      ) : (
+                        <span style={{ color: cfg.color }}>{article.authorName}</span>
+                      )}
+                    </p>
+                  )}
+                </div>
+
+                <span
+                  className="text-xs font-ui mt-3 transition-colors group-hover:text-white"
+                  style={{ color: cfg.color }}
+                >
+                  Read More →
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Flame Rating Display ───────────────────────────────────────────────────
 function FlameDisplay({ rating, max = 5 }: { rating: number; max?: number }) {
   return (
     <span className="flame-rating" title={`${rating}/${max} Flames`}>
@@ -452,6 +630,9 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+
+            {/* Latest by Vertical — live data from DB */}
+            <LatestByVertical />
 
             {/* Category Sections */}
             {CATEGORY_SECTIONS.map((section) => (
