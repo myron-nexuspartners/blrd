@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link, useSearch } from "wouter";
+import { Link, useSearch, useLocation } from "wouter";
 import Layout from "@/components/Layout";
 import { Search, Clock, TrendingUp } from "lucide-react";
 import { Byline } from "@/components/Byline";
@@ -175,78 +175,83 @@ const ALL_ARTICLES = [
 ];
 
 function ArticleCard({ article, large = false }: { article: typeof ALL_ARTICLES[0]; large?: boolean }) {
+  const [, navigate] = useLocation();
   if (large) {
     return (
-      <Link href={`/news/${article.id}`}>
-        <div className="blrd-card group cursor-pointer overflow-hidden">
-          <div className="h-56 overflow-hidden">
-            <img
-              src={article.image}
-              alt={article.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          </div>
-          <div className="p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`blrd-tag blrd-tag-${article.tag}`}>{article.category}</span>
-              <span className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>{article.timeAgo}</span>
-              <span className="text-xs font-ui ml-auto" style={{ color: "var(--blrd-gray)" }}>{article.readTime}</span>
-            </div>
-            <h2
-              className="font-semibold leading-snug mb-2 text-lg transition-colors group-hover:text-cyan-400"
-              style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
-            >
-              {article.title}
-            </h2>
-            <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--blrd-gray)" }}>
-              {article.subhead}
-            </p>
-            <div className="flex items-center justify-between gap-3">
-              <Byline
-                authorName={article.author}
-                authorSlug={AUTHOR_SLUG_MAP[article.author]}
-                compact
-              />
-              <span className="text-xs" style={{ color: "var(--blrd-gray)" }}>💬 {article.comments}</span>
-            </div>
-          </div>
-        </div>
-      </Link>
-    );
-  }
-
-  return (
-    <Link href={`/news/${article.id}`}>
-      <div className="blrd-card flex gap-3 p-3 group cursor-pointer">
-        <div className="w-24 h-20 shrink-0 rounded overflow-hidden bg-gray-800">
+      <div
+        className="blrd-card group cursor-pointer overflow-hidden"
+        onClick={() => navigate(`/news/${article.id}`)}
+        role="article"
+      >
+        <div className="h-56 overflow-hidden">
           <img
             src={article.image}
             alt={article.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+        <div className="p-5">
+          <div className="flex items-center gap-2 mb-2">
             <span className={`blrd-tag blrd-tag-${article.tag}`}>{article.category}</span>
             <span className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>{article.timeAgo}</span>
+            <span className="text-xs font-ui ml-auto" style={{ color: "var(--blrd-gray)" }}>{article.readTime}</span>
           </div>
-          <h3
-            className="text-sm font-semibold leading-snug mb-1 line-clamp-2 transition-colors group-hover:text-cyan-400"
+          <h2
+            className="font-semibold leading-snug mb-2 text-lg transition-colors group-hover:text-cyan-400"
             style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
           >
             {article.title}
-          </h3>
-          <div className="flex items-center justify-between gap-2">
+          </h2>
+          <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--blrd-gray)" }}>
+            {article.subhead}
+          </p>
+          <div className="flex items-center justify-between gap-3">
             <Byline
               authorName={article.author}
               authorSlug={AUTHOR_SLUG_MAP[article.author]}
               compact
             />
-            <span className="text-xs shrink-0" style={{ color: "var(--blrd-gray)" }}>{article.readTime}</span>
+            <span className="text-xs" style={{ color: "var(--blrd-gray)" }}>💬 {article.comments}</span>
           </div>
         </div>
       </div>
-    </Link>
+    );
+  }
+
+  return (
+    <div
+      className="blrd-card flex gap-3 p-3 group cursor-pointer"
+      onClick={() => navigate(`/news/${article.id}`)}
+      role="article"
+    >
+      <div className="w-24 h-20 shrink-0 rounded overflow-hidden bg-gray-800">
+        <img
+          src={article.image}
+          alt={article.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className={`blrd-tag blrd-tag-${article.tag}`}>{article.category}</span>
+          <span className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>{article.timeAgo}</span>
+        </div>
+        <h3
+          className="text-sm font-semibold leading-snug mb-1 line-clamp-2 transition-colors group-hover:text-cyan-400"
+          style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
+        >
+          {article.title}
+        </h3>
+        <div className="flex items-center justify-between gap-2">
+          <Byline
+            authorName={article.author}
+            authorSlug={AUTHOR_SLUG_MAP[article.author]}
+            compact
+          />
+          <span className="text-xs shrink-0" style={{ color: "var(--blrd-gray)" }}>{article.readTime}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
