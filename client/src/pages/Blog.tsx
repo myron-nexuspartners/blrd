@@ -1,87 +1,104 @@
-import { useState } from "react";
-import { Link } from "wouter";
+import { useState, useMemo } from "react";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { PenLine, Lock, Clock, MessageSquare, User } from "lucide-react";
-
-const BLOG_POSTS = [
-  {
-    id: 1, category: "gaming", tag: "gaming",
-    title: "Why I Finally Gave Elden Ring Another Chance — And Why It Changed My Relationship with Difficulty",
-    subhead: "After rage-quitting twice, I came back with a different mindset. Here's what I learned about myself and the game.",
-    author: "Marcus T.", authorRole: "Community Member",
-    timeAgo: "2 days ago", readTime: "8 min read", comments: 34,
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80",
-    excerpt: "I'll be honest: I quit Elden Ring twice. The first time was at Margit. The second time was at Godrick. I told myself it wasn't for me — that I was too busy, too casual, that FromSoftware games were gatekeeping masquerading as design philosophy...",
-    featured: true,
-  },
-  {
-    id: 2, category: "culture", tag: "culture",
-    title: "Being Black at Anime Conventions: The Joy, the Awkwardness, and the Community I Found",
-    subhead: "A personal essay about navigating predominantly white geek spaces and finding your people anyway.",
-    author: "Simone H.", authorRole: "Community Member",
-    timeAgo: "4 days ago", readTime: "12 min read", comments: 89,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80",
-    excerpt: "The first time I walked into an anime convention, I was 16 and I was terrified. Not because of the crowds — I'd been to concerts before — but because I could count the number of Black people I saw on one hand...",
-    featured: true,
-  },
-  {
-    id: 3, category: "comics", tag: "comics",
-    title: "The Case for Reading Comics Out of Order: A Contrarian's Guide to Marvel",
-    subhead: "Forget continuity. Here's why jumping in wherever interests you is actually the right move.",
-    author: "Devon K.", authorRole: "Community Member",
-    timeAgo: "1 week ago", readTime: "6 min read", comments: 22,
-    image: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&q=80",
-    excerpt: "Every time someone asks me how to get into comics, I watch their eyes glaze over when I mention continuity. 'Do I need to read 60 years of back issues?' No. Absolutely not. Here's my controversial take...",
-    featured: false,
-  },
-  {
-    id: 4, category: "film", tag: "film",
-    title: "Afrofuturism Isn't a Genre — It's a Lens, and Here's Why That Distinction Matters",
-    subhead: "A critical look at how we talk about Black speculative fiction and why the framing shapes the conversation.",
-    author: "Jordan P.", authorRole: "Community Member",
-    timeAgo: "1 week ago", readTime: "10 min read", comments: 47,
-    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80",
-    excerpt: "When Black Panther came out in 2018, every think-piece called it an 'Afrofuturist film.' And while that's not wrong, the label started doing something interesting — it began to feel like a box...",
-    featured: false,
-  },
-  {
-    id: 5, category: "gaming", tag: "gaming",
-    title: "I Spent 200 Hours in Baldur's Gate 3 and Here's What I Learned About Myself",
-    subhead: "A long-form reflection on choice, consequence, and what RPGs reveal about our values.",
-    author: "Keisha D.", authorRole: "Community Member",
-    timeAgo: "2 weeks ago", readTime: "15 min read", comments: 63,
-    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80",
-    excerpt: "I've played a lot of RPGs. I've made a lot of choices in fictional worlds. But nothing prepared me for the moment in Baldur's Gate 3 when I had to decide whether to...",
-    featured: false,
-  },
-  {
-    id: 6, category: "creators", tag: "creators",
-    title: "How I Built a 10K Gaming Community from Zero — Without Going Viral",
-    subhead: "Slow growth, genuine connection, and the long game of community building.",
-    author: "TechBlerdie", authorRole: "Community Member",
-    timeAgo: "2 weeks ago", readTime: "9 min read", comments: 38,
-    image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80",
-    excerpt: "Everyone wants to go viral. I get it. But after two years of building my gaming community, I've learned that the most valuable growth is the kind that happens slowly...",
-    featured: false,
-  },
-];
+import { PenLine, Lock, MessageSquare, User } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 const CATEGORIES = [
-  { id: "all", label: "All" },
-  { id: "gaming", label: "Gaming" },
-  { id: "film", label: "Movies" },
-  { id: "tv", label: "TV" },
-  { id: "comics", label: "Comics" },
-  { id: "tech", label: "Tech" },
-  { id: "culture", label: "Culture" },
+  { id: "all",      label: "All"      },
+  { id: "gaming",   label: "Gaming"   },
+  { id: "film",     label: "Movies"   },
+  { id: "tv",       label: "TV"       },
+  { id: "comics",   label: "Comics"   },
+  { id: "tech",     label: "Tech"     },
+  { id: "culture",  label: "Culture"  },
   { id: "creators", label: "Creators" },
 ];
 
-function BlogCard({ post, large = false }: { post: typeof BLOG_POSTS[0]; large?: boolean }) {
+// Placeholder posts — visible while DB is empty or loading
+const PLACEHOLDER_POSTS = [
+  {
+    id: 1, slug: "placeholder-b1", category: "gaming", tag: "gaming",
+    title: "Why I Finally Gave Elden Ring Another Chance — And Why It Changed My Relationship with Difficulty",
+    subhead: "After rage-quitting twice, I came back with a different mindset. Here's what I learned.",
+    author: "Marcus T.", authorRole: "Community Member",
+    timeAgo: "2 days ago", readTime: "8 min read", viewCount: 34,
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80",
+    excerpt: "I'll be honest: I quit Elden Ring twice. The first time was at Margit. The second time was at Godrick...",
+    featured: true,
+  },
+  {
+    id: 2, slug: "placeholder-b2", category: "culture", tag: "culture",
+    title: "Being Black at Anime Conventions: The Joy, the Awkwardness, and the Community I Found",
+    subhead: "A personal essay about navigating geek spaces and finding your people anyway.",
+    author: "Simone H.", authorRole: "Community Member",
+    timeAgo: "4 days ago", readTime: "12 min read", viewCount: 89,
+    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80",
+    excerpt: "The first time I walked into an anime convention, I was 16 and I was terrified...",
+    featured: true,
+  },
+  {
+    id: 3, slug: "placeholder-b3", category: "comics", tag: "comics",
+    title: "The Case for Reading Comics Out of Order: A Contrarian's Guide to Marvel",
+    subhead: "Forget continuity. Here's why jumping in wherever interests you is the right move.",
+    author: "Devon K.", authorRole: "Community Member",
+    timeAgo: "1 week ago", readTime: "6 min read", viewCount: 22,
+    image: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&q=80",
+    excerpt: "Every time someone asks me how to get into comics, I watch their eyes glaze over when I mention continuity...",
+    featured: false,
+  },
+  {
+    id: 4, slug: "placeholder-b4", category: "film", tag: "film",
+    title: "Afrofuturism Isn't a Genre — It's a Lens, and Here's Why That Distinction Matters",
+    subhead: "A critical look at how we talk about Black speculative fiction.",
+    author: "Jordan P.", authorRole: "Community Member",
+    timeAgo: "1 week ago", readTime: "10 min read", viewCount: 47,
+    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80",
+    excerpt: "When Black Panther came out in 2018, every think-piece called it an Afrofuturist film...",
+    featured: false,
+  },
+  {
+    id: 5, slug: "placeholder-b5", category: "gaming", tag: "gaming",
+    title: "I Spent 200 Hours in Baldur's Gate 3 and Here's What I Learned About Myself",
+    subhead: "A long-form reflection on choice, consequence, and what RPGs reveal about our values.",
+    author: "Keisha D.", authorRole: "Community Member",
+    timeAgo: "2 weeks ago", readTime: "15 min read", viewCount: 63,
+    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&q=80",
+    excerpt: "I've played a lot of RPGs. But nothing prepared me for the moment in Baldur's Gate 3 when...",
+    featured: false,
+  },
+];
+
+// Map a DB article row to the shape BlogCard expects
+function normalisePost(a: any) {
+  const wordCount = (a.body ?? "").split(/\s+/).length;
+  const readMins  = Math.max(1, Math.round(wordCount / 200));
+  return {
+    id:         a.id,
+    slug:       a.slug,
+    category:   a.category,
+    tag:        a.category,
+    title:      a.title,
+    subhead:    a.subhead ?? "",
+    excerpt:    (a.body ?? "").slice(0, 220).replace(/<[^>]+>/g, "") + "…",
+    author:     a.authorName ?? "Community Member",
+    authorRole: "Community Member",
+    timeAgo:    a.publishedAt
+                  ? formatDistanceToNow(new Date(a.publishedAt), { addSuffix: true })
+                  : "",
+    readTime:   `${readMins} min read`,
+    viewCount:  a.viewCount ?? 0,
+    featured:   a.isFeatured ?? false,
+    image:      a.imageUrl ?? "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80",
+  };
+}
+
+type NormalisedPost = ReturnType<typeof normalisePost>;
+
+function BlogCard({ post, large = false }: { post: NormalisedPost; large?: boolean }) {
   if (large) {
     return (
       <div className="blrd-card group overflow-hidden cursor-pointer">
@@ -112,12 +129,8 @@ function BlogCard({ post, large = false }: { post: typeof BLOG_POSTS[0]; large?:
             {post.excerpt}
           </p>
           <div className="flex items-center gap-3 text-xs" style={{ color: "var(--blrd-gray)" }}>
-            <span className="flex items-center gap-1 font-ui">
-              <User size={11} /> {post.author}
-            </span>
-            <span className="flex items-center gap-1 font-ui">
-              <MessageSquare size={11} /> {post.comments}
-            </span>
+            <span className="flex items-center gap-1 font-ui"><User size={11} /> {post.author}</span>
+            <span className="flex items-center gap-1 font-ui"><MessageSquare size={11} /> {post.viewCount}</span>
           </div>
         </div>
       </div>
@@ -146,7 +159,7 @@ function BlogCard({ post, large = false }: { post: typeof BLOG_POSTS[0]; large?:
         </h3>
         <div className="flex items-center gap-3 text-xs" style={{ color: "var(--blrd-gray)" }}>
           <span className="font-ui">{post.author}</span>
-          <span>💬 {post.comments}</span>
+          <span>👁 {post.viewCount}</span>
           <span className="ml-auto">{post.readTime}</span>
         </div>
       </div>
@@ -156,10 +169,7 @@ function BlogCard({ post, large = false }: { post: typeof BLOG_POSTS[0]; large?:
 
 function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
   const [form, setForm] = useState({
-    title: "",
-    subhead: "",
-    body: "",
-    category: "gaming" as const,
+    title: "", subhead: "", body: "", category: "gaming" as const,
   });
 
   const submitMutation = trpc.blog.submit.useMutation({
@@ -180,18 +190,18 @@ function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     submitMutation.mutate({
-      title: form.title,
-      subhead: form.subhead || undefined,
-      body: form.body,
+      title:    form.title,
+      subhead:  form.subhead || undefined,
+      body:     form.body,
       category: form.category,
     });
   };
 
   const inputStyle = {
-    background: "var(--blrd-dark-3)",
+    background:  "var(--blrd-dark-3)",
     borderColor: "var(--blrd-border)",
-    color: "var(--blrd-white)",
-    outline: "none",
+    color:       "var(--blrd-white)",
+    outline:     "none",
   };
 
   return (
@@ -201,32 +211,25 @@ function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
           Title *
         </label>
         <input
-          type="text"
-          value={form.title}
+          type="text" value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           placeholder="Your compelling headline..."
           className="w-full px-3 py-2.5 text-sm rounded border"
-          style={inputStyle}
-          required
-          maxLength={255}
+          style={inputStyle} required maxLength={255}
         />
       </div>
-
       <div>
         <label className="block text-xs font-display font-bold mb-1.5 tracking-widest uppercase" style={{ color: "var(--blrd-cyan)" }}>
           Subheadline
         </label>
         <input
-          type="text"
-          value={form.subhead}
+          type="text" value={form.subhead}
           onChange={(e) => setForm({ ...form, subhead: e.target.value })}
           placeholder="A brief description of your post..."
           className="w-full px-3 py-2.5 text-sm rounded border"
-          style={inputStyle}
-          maxLength={500}
+          style={inputStyle} maxLength={500}
         />
       </div>
-
       <div>
         <label className="block text-xs font-display font-bold mb-1.5 tracking-widest uppercase" style={{ color: "var(--blrd-cyan)" }}>
           Category *
@@ -242,7 +245,6 @@ function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
           ))}
         </select>
       </div>
-
       <div>
         <label className="block text-xs font-display font-bold mb-1.5 tracking-widest uppercase" style={{ color: "var(--blrd-cyan)" }}>
           Your Post *
@@ -251,27 +253,22 @@ function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
           value={form.body}
           onChange={(e) => setForm({ ...form, body: e.target.value })}
           placeholder="Share your thoughts, opinions, and stories with the BLRD community..."
-          rows={10}
-          className="w-full px-3 py-2.5 text-sm rounded border resize-y"
-          style={inputStyle}
-          required
-          minLength={50}
+          rows={10} className="w-full px-3 py-2.5 text-sm rounded border resize-y"
+          style={inputStyle} required minLength={50}
         />
         <div className="text-xs mt-1 text-right font-ui" style={{ color: "var(--blrd-gray)" }}>
           {form.body.length} characters (min 50)
         </div>
       </div>
-
       <div
         className="rounded p-3 text-xs"
-        style={{ background: "rgba(27,201,201,0.08)", border: "1px solid rgba(27,201,201,0.2)", color: "var(--blrd-gray-light)" }}
+        style={{ background: "rgba(255,179,0,0.08)", border: "1px solid rgba(255,179,0,0.2)", color: "var(--blrd-gray-light)" }}
       >
-        <strong style={{ color: "var(--blrd-amber)" }}>Submission Guidelines:</strong> Posts are reviewed by the BLRD team before publishing. Keep it respectful, original, and on-topic. No spam, hate speech, or plagiarism. We reserve the right to edit for clarity.
+        <strong style={{ color: "var(--blrd-amber)" }}>Submission Guidelines:</strong>{" "}
+        Posts are reviewed by the BLRD team before publishing. Keep it respectful, original, and on-topic.
       </div>
-
       <button
-        type="submit"
-        disabled={submitMutation.isPending}
+        type="submit" disabled={submitMutation.isPending}
         className="py-3 rounded font-ui font-bold text-sm tracking-wider transition-all hover:brightness-110 disabled:opacity-50"
         style={{ background: "var(--blrd-cyan)", color: "var(--blrd-black)", letterSpacing: "0.1em" }}
       >
@@ -284,15 +281,26 @@ function SubmitPostForm({ onSuccess }: { onSuccess: () => void }) {
 export default function Blog() {
   const { isAuthenticated } = useAuth();
   const [activeCategory, setActiveCategory] = useState("all");
-  const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [showSubmitForm,  setShowSubmitForm] = useState(false);
 
-  const filtered =
-    activeCategory === "all"
-      ? BLOG_POSTS
-      : BLOG_POSTS.filter((p) => p.category === activeCategory);
+  // Live query — returns [] until published blog articles exist in DB
+  const { data: dbPosts = [] } = trpc.articles.list.useQuery(
+    { type: "blog", limit: 100 },
+    { staleTime: 60_000 }
+  );
+
+  // Use live DB data when available; fall back to placeholders
+  const allPosts: NormalisedPost[] = useMemo(
+    () => (dbPosts.length > 0 ? dbPosts.map(normalisePost) : PLACEHOLDER_POSTS),
+    [dbPosts]
+  );
+
+  const filtered = activeCategory === "all"
+    ? allPosts
+    : allPosts.filter((p) => p.category === activeCategory);
 
   const featured = filtered.filter((p) => p.featured);
-  const rest = filtered.filter((p) => !p.featured);
+  const rest     = filtered.filter((p) => !p.featured);
 
   return (
     <Layout>
@@ -309,17 +317,13 @@ export default function Blog() {
           </div>
           <button
             onClick={() => {
-              if (!isAuthenticated) {
-                window.location.href = getLoginUrl();
-                return;
-              }
+              if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
               setShowSubmitForm(!showSubmitForm);
             }}
             className="flex items-center gap-2 px-4 py-2 rounded font-ui font-bold text-sm tracking-wider transition-all hover:brightness-110 shrink-0"
             style={{ background: "var(--blrd-cyan)", color: "var(--blrd-black)", letterSpacing: "0.08em" }}
           >
-            <PenLine size={14} />
-            Write a Post
+            <PenLine size={14} /> Write a Post
           </button>
         </div>
       </div>
@@ -334,11 +338,7 @@ export default function Blog() {
             <h2 className="font-display text-sm font-bold tracking-widest uppercase" style={{ color: "var(--blrd-cyan)" }}>
               Submit a Blog Post
             </h2>
-            <button
-              onClick={() => setShowSubmitForm(false)}
-              className="text-xs font-ui"
-              style={{ color: "var(--blrd-gray)" }}
-            >
+            <button onClick={() => setShowSubmitForm(false)} className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>
               ✕ Close
             </button>
           </div>
@@ -370,9 +370,9 @@ export default function Blog() {
             onClick={() => setActiveCategory(cat.id)}
             className="px-3 py-1.5 text-xs rounded border transition-all font-ui font-semibold tracking-wide"
             style={{
-              background: activeCategory === cat.id ? "var(--blrd-cyan)" : "var(--blrd-dark-2)",
-              borderColor: activeCategory === cat.id ? "var(--blrd-cyan)" : "var(--blrd-border)",
-              color: activeCategory === cat.id ? "var(--blrd-black)" : "var(--blrd-gray-light)",
+              background:  activeCategory === cat.id ? "var(--blrd-cyan)"  : "var(--blrd-dark-2)",
+              borderColor: activeCategory === cat.id ? "var(--blrd-cyan)"  : "var(--blrd-border)",
+              color:       activeCategory === cat.id ? "var(--blrd-black)" : "var(--blrd-gray-light)",
             }}
           >
             {cat.label}
@@ -383,13 +383,9 @@ export default function Blog() {
       {/* Featured Posts */}
       {featured.length > 0 && (
         <div className="mb-6">
-          <div className="section-header">
-            <h2>Featured Posts</h2>
-          </div>
+          <div className="section-header"><h2>Featured Posts</h2></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {featured.map((p) => (
-              <BlogCard key={p.id} post={p} large />
-            ))}
+            {featured.map((p) => <BlogCard key={p.id} post={p} large />)}
           </div>
         </div>
       )}
@@ -401,9 +397,7 @@ export default function Blog() {
           <span className="text-xs font-ui" style={{ color: "var(--blrd-gray)" }}>{filtered.length} posts</span>
         </div>
         <div className="flex flex-col gap-3">
-          {(featured.length > 0 ? rest : filtered).map((p) => (
-            <BlogCard key={p.id} post={p} />
-          ))}
+          {(featured.length > 0 ? rest : filtered).map((p) => <BlogCard key={p.id} post={p} />)}
         </div>
       </div>
 
@@ -412,22 +406,19 @@ export default function Blog() {
         <div
           className="mt-8 rounded p-6 text-center"
           style={{
-            background: "linear-gradient(135deg, rgba(27,201,201,0.08) 0%, rgba(0,0,0,1) 100%)",
-            border: "1px solid rgba(27,201,201,0.2)",
+            background: "linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(8,10,15,1) 100%)",
+            border:     "1px solid rgba(0,212,255,0.2)",
           }}
         >
           <h3 className="font-display font-bold mb-2 text-sm" style={{ color: "var(--blrd-white)" }}>
             Have Something to Say?
           </h3>
           <p className="text-xs mb-4 max-w-sm mx-auto" style={{ color: "var(--blrd-gray)" }}>
-            The BLRD community blog is your platform. Share your opinions, reviews, essays, and stories with thousands of fellow geek culture enthusiasts.
+            The BLRD community blog is your platform. Share your opinions, reviews, essays, and stories.
           </p>
           <button
             onClick={() => {
-              if (!isAuthenticated) {
-                window.location.href = getLoginUrl();
-                return;
-              }
+              if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
               setShowSubmitForm(true);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
