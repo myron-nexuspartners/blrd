@@ -22,16 +22,16 @@ export const appRouter = router({
     }),
   }),
 
-  // ─── Admin ───────────────────────────────────────────────────────────────
+  // --- Admin --------------------------------------------------------------
   admin: adminRouter,
 
-  // ─── Authors ─────────────────────────────────────────────────────────────
+  // --- Authors ------------------------------------------------------------
   authors: authorsRouter,
 
-  // ─── Pipeline ────────────────────────────────────────────────────────────
+  // --- Pipeline -----------------------------------------------------------
   pipeline: pipelineRouter,
 
-  // ─── Reviews ────────────────────────────────────────────────────────────
+  // --- Reviews ------------------------------------------------------------
   reviews: router({
     rate: protectedProcedure
       .input(z.object({ contentId: z.number(), rating: z.number().min(1).max(5) }))
@@ -72,7 +72,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ─── Events ─────────────────────────────────────────────────────────────
+  // --- Events -------------------------------------------------------------
   events: router({
     trackClick: publicProcedure
       .input(z.object({ eventId: z.number() }))
@@ -89,7 +89,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ─── Articles (public queries) ────────────────────────────────────────────
+  // --- Articles (public queries) -----------------------------------------
   articles: router({
     // Returns the single most-recent published article for each of the 5 verticals
     latestByVertical: publicProcedure.query(async () => {
@@ -132,9 +132,41 @@ export const appRouter = router({
       // Ensure all 5 verticals are represented (fill missing with null placeholders)
       return verticals.map((v) => result.find((r) => r.vertical === v) ?? null);
     }),
+
+    // --- articles.list -- powers News.tsx and Blog.tsx --------------------
+    list: publicProcedure
+      .input(
+        z.object({
+          category: z.string().optional(),
+          type:     z.string().optional(),
+          limit:    z.number().min(1).max(100).optional().default(50),
+          offset:   z.number().min(0).optional().default(0),
+        })
+      )
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+
+        const conditions = [eq(articles.status, "published")];
+
+        if (input.category && input.category !== "all") {
+          conditions.push(eq(articles.category, input.category as any));
+        }
+        if (input.type && input.type !== "all") {
+          conditions.push(eq(articles.type, input.type as any));
+        }
+
+        return await db
+          .select()
+          .from(articles)
+          .where(and(...conditions))
+          .orderBy(desc(articles.publishedAt))
+          .limit(input.limit)
+          .offset(input.offset);
+      }),
   }),
 
-  // ─── Blog / Articles ─────────────────────────────────────────────────────
+  // --- Blog / Articles ----------------------------------------------------
   blog: router({
     submit: protectedProcedure
       .input(
@@ -150,14 +182,11 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database unavailable");
 
-        const slug =
-          input.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "")
-            .slice(0, 200) +
-          "-" +
-          Date.now();
+        const slug = input.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")
+          .slice(0, 200) + "-" + Date.now();
 
         await db.insert(articles).values({
           slug,
@@ -184,7 +213,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ─── Contact ─────────────────────────────────────────────────────────────
+  // --- Contact ------------------------------------------------------------
   contact: router({
     submit: publicProcedure
       .input(
