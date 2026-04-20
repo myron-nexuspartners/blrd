@@ -125,3 +125,11 @@
 - [x] Rewrite About page roadmap: accelerated growth/revenue/profit milestones anchored to April 2027 scaling goal
 - [x] Add event presence signposts: BlerdCon 2027, CES 2027, SXSW, Comic-Con KC/NY/SD, The Game Awards, US/UK/LatAm eSports
 - [x] Align milestone phases to current date (April 2026) through end of 2027
+
+## v7 — Events Page Rebuild
+- [x] Fix category and type filter logic so events correctly show/hide on filter change
+- [x] Filter bar order: All Categories first, then All Types, then view toggle
+- [x] Replace text-based card/table toggle with icon-only buttons (LayoutGrid / Table2)
+- [x] Add right-rail ad zone (sidebar rectangle) on Events page
+- [x] Responsive layout: full-width on mobile, 2-col with right rail on desktop
+- [x] Ensure card view and table view both respect active filters without losing items
