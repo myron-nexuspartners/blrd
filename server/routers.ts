@@ -22,16 +22,16 @@ export const appRouter = router({
     }),
   }),
 
-  // --- Admin --------------------------------------------------------------
+  // ─── Admin ──────────────────────────────────────────────────────────────────────────────
   admin: adminRouter,
 
-  // --- Authors ------------------------------------------------------------
+  // ─── Authors ─────────────────────────────────────────────────────────────────────────────
   authors: authorsRouter,
 
-  // --- Pipeline -----------------------------------------------------------
+  // ─── Pipeline ────────────────────────────────────────────────────────────────────────────
   pipeline: pipelineRouter,
 
-  // --- Reviews ------------------------------------------------------------
+  // ─── Reviews ──────────────────────────────────────────────────────────────────────────────
   reviews: router({
     rate: protectedProcedure
       .input(z.object({ contentId: z.number(), rating: z.number().min(1).max(5) }))
@@ -72,7 +72,7 @@ export const appRouter = router({
       }),
   }),
 
-  // --- Events -------------------------------------------------------------
+  // ─── Events ───────────────────────────────────────────────────────────────────────────────
   events: router({
     trackClick: publicProcedure
       .input(z.object({ eventId: z.number() }))
@@ -89,7 +89,7 @@ export const appRouter = router({
       }),
   }),
 
-  // --- Articles (public queries) -----------------------------------------
+  // ─── Articles (public queries) ─────────────────────────────────────────────────────────────────
   articles: router({
     // Returns the single most-recent published article for each of the 5 verticals
     latestByVertical: publicProcedure.query(async () => {
@@ -133,7 +133,59 @@ export const appRouter = router({
       return verticals.map((v) => result.find((r) => r.vertical === v) ?? null);
     }),
 
-    // --- articles.list -- powers News.tsx and Blog.tsx --------------------
+  // ─── articles.bySlug — powers /news/:slug detail page ──────────────────────────────────────────
+    bySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+
+        const rows = await db
+          .select()
+          .from(articles)
+          .where(eq(articles.slug, input.slug))
+          .limit(1);
+
+        return rows[0] ?? null;
+      }),
+
+  // ─── articles.view — increments view count ──────────────────────────────────────────────────────
+    view: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return { success: false };
+
+        await db
+          .update(articles)
+          .set({ viewCount: sql`${articles.viewCount} + 1` })
+          .where(eq(articles.slug, input.slug));
+
+        return { success: true };
+      }),
+
+  // ─── articles.related — same category, different slug ───────────────────────────────────────────
+    related: publicProcedure
+      .input(z.object({ slug: z.string(), category: z.string(), limit: z.number().min(1).max(6).optional().default(3) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+
+        return await db
+          .select()
+          .from(articles)
+          .where(
+            and(
+              eq(articles.status, "published"),
+              eq(articles.category, input.category as any),
+              sql`${articles.slug} != ${input.slug}`
+            )
+          )
+          .orderBy(desc(articles.publishedAt))
+          .limit(input.limit);
+      }),
+
+  // ─── articles.list — powers News.tsx and Blog.tsx ───────────────────────────────────────────────
     list: publicProcedure
       .input(
         z.object({
@@ -166,7 +218,7 @@ export const appRouter = router({
       }),
   }),
 
-  // --- Blog / Articles ----------------------------------------------------
+  // ─── Blog / Articles ───────────────────────────────────────────────────────────────────────────
   blog: router({
     submit: protectedProcedure
       .input(
@@ -213,7 +265,7 @@ export const appRouter = router({
       }),
   }),
 
-  // --- Contact ------------------------------------------------------------
+  // ─── Contact ───────────────────────────────────────────────────────────────────────────────
   contact: router({
     submit: publicProcedure
       .input(
