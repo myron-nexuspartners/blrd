@@ -69,18 +69,51 @@ export const pipelineRouter = router({
       return { success: true };
     }),
 
-  // ─── Admin: list pipeline-sourced articles (draft queue) ─────────────────
+  // ─── Admin: list pipeline-sourced draft/pending articles ───────────────────
   draftQueue: adminProcedure
     .input(z.object({ limit: z.number().min(1).max(100).default(50) }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return [];
+      const { and, or, inArray } = await import("drizzle-orm");
       return db
         .select()
         .from(articles)
-        .where(eq(articles.source, "pipeline"))
+        .where(
+          and(
+            eq(articles.source, "pipeline"),
+            or(
+              eq(articles.status, "draft"),
+              eq(articles.status, "pending")
+            )
+          )
+        )
         .orderBy(desc(articles.createdAt))
         .limit(input.limit);
+    }),
+
+  // ─── Admin: bulk-publish selected draft articles ──────────────────────────
+  publishDrafts: adminProcedure
+    .input(z.object({ ids: z.array(z.number()).min(1) }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database unavailable");
+      const { inArray } = await import("drizzle-orm");
+      await db
+        .update(articles)
+        .set({ status: "published", publishedAt: new Date() })
+        .where(inArray(articles.id, input.ids));
+      return { success: true, count: input.ids.length };
+    }),
+
+  // ─── Admin: reject (delete) a single draft article ───────────────────────
+  rejectDraft: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database unavailable");
+      await db.delete(articles).where(eq(articles.id, input.id));
+      return { success: true };
     }),
 
   // ─── Public (token-auth): submit article from pipeline ───────────────────

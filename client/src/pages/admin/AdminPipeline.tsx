@@ -30,10 +30,16 @@ export default function AdminPipeline() {
   const { data: tokens, isLoading: tokensLoading } = trpc.pipeline.listTokens.useQuery();
   const { data: draftQueue, isLoading: queueLoading } = trpc.pipeline.draftQueue.useQuery({ limit: 50 });
 
+  // Token dialog state
   const [showTokenDialog, setShowTokenDialog] = useState(false);
   const [tokenLabel, setTokenLabel] = useState("");
   const [newToken, setNewToken] = useState<string | null>(null);
 
+  // Draft queue selection state
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [previewArticle, setPreviewArticle] = useState<any | null>(null);
+
+  // ─── Mutations ───────────────────────────────────────────────────────────────
   const generateTokenMutation = trpc.pipeline.generateToken.useMutation({
     onSuccess: (data) => {
       setNewToken(data.token);
@@ -51,6 +57,40 @@ export default function AdminPipeline() {
     onError: (e) => toast.error(e.message),
   });
 
+  const publishDraftsMutation = trpc.pipeline.publishDrafts.useMutation({
+    onSuccess: (data) => {
+      toast.success(`${data.count} article${data.count === 1 ? "" : "s"} published! 🔥`);
+      setSelectedIds(new Set());
+      utils.pipeline.draftQueue.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const rejectDraftMutation = trpc.pipeline.rejectDraft.useMutation({
+    onSuccess: () => {
+      toast.success("Article rejected and removed");
+      utils.pipeline.draftQueue.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  // ─── Selection helpers ───────────────────────────────────────────────────────
+  const allIds = (draftQueue ?? []).map((a) => a.id);
+  const allSelected = allIds.length > 0 && allIds.every((id) => selectedIds.has(id));
+
+  function toggleAll() {
+    setSelectedIds(allSelected ? new Set() : new Set(allIds));
+  }
+
+  function toggleOne(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => toast.success("Copied to clipboard"));
   }
@@ -60,7 +100,7 @@ export default function AdminPipeline() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {/* ─── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white font-['Metropolis',sans-serif] uppercase tracking-wider">
@@ -78,7 +118,7 @@ export default function AdminPipeline() {
         </Button>
       </div>
 
-      {/* Pipeline Integration Guide */}
+      {/* ─── Integration Guide ──────────────────────────────────────────────── */}
       <Card className="bg-zinc-900 border-zinc-700">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-bold text-[#1BC9C9] flex items-center gap-2">
@@ -87,7 +127,7 @@ export default function AdminPipeline() {
         </CardHeader>
         <CardContent>
           <p className="text-zinc-400 text-sm mb-3">
-            Replace the WordPress publisher in your Python agent with this endpoint. The pipeline will submit articles as drafts for your review.
+            Replace the WordPress publisher in your Python agent with this endpoint. Articles arrive as drafts for your review.
           </p>
           <div className="bg-black rounded-md p-4 font-mono text-xs text-zinc-300 overflow-x-auto">
             <div className="text-zinc-500 mb-1"># In blerd_content_agent.py — replace publish_to_wordpress()</div>
@@ -132,7 +172,7 @@ export default function AdminPipeline() {
         </CardContent>
       </Card>
 
-      {/* API Tokens */}
+      {/* ─── API Tokens ─────────────────────────────────────────────────────── */}
       <div>
         <h2 className="text-lg font-bold text-white mb-4 font-['Metropolis',sans-serif] uppercase tracking-wider flex items-center gap-2">
           <Key className="w-4 h-4 text-[#1BC9C9]" /> API Tokens
@@ -168,8 +208,7 @@ export default function AdminPipeline() {
                 </div>
                 <div className="flex gap-1">
                   <Button
-                    size="icon"
-                    variant="ghost"
+                    size="icon" variant="ghost"
                     className="h-7 w-7 text-zinc-400 hover:text-[#1BC9C9]"
                     onClick={() => copyToClipboard(token.token)}
                     title="Copy token"
@@ -177,8 +216,7 @@ export default function AdminPipeline() {
                     <Copy className="w-3.5 h-3.5" />
                   </Button>
                   <Button
-                    size="icon"
-                    variant="ghost"
+                    size="icon" variant="ghost"
                     className="h-7 w-7 text-zinc-400 hover:text-red-400"
                     onClick={() => {
                       if (confirm("Revoke this token? The pipeline will stop working until a new token is configured.")) {
@@ -215,20 +253,41 @@ export default function AdminPipeline() {
 
       <Separator className="bg-zinc-800" />
 
-      {/* Draft Queue */}
+      {/* ─── Draft Queue ────────────────────────────────────────────────────── */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h2 className="text-lg font-bold text-white font-['Metropolis',sans-serif] uppercase tracking-wider flex items-center gap-2">
             <FileText className="w-4 h-4 text-[#FF5722]" /> Pipeline Draft Queue
+            {draftQueue && draftQueue.length > 0 && (
+              <span className="text-xs font-normal text-zinc-400 normal-case tracking-normal">
+                ({draftQueue.length} pending)
+              </span>
+            )}
           </h2>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-zinc-400 hover:text-white"
-            onClick={() => utils.pipeline.draftQueue.invalidate()}
-          >
-            <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <Button
+                size="sm"
+                className="bg-[#1BC9C9] hover:bg-[#1BC9C9]/80 text-black font-bold"
+                disabled={publishDraftsMutation.isPending}
+                onClick={() => {
+                  if (confirm(`Publish ${selectedIds.size} selected article${selectedIds.size === 1 ? "" : "s"}?`)) {
+                    publishDraftsMutation.mutate({ ids: Array.from(selectedIds) });
+                  }
+                }}
+              >
+                <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                Publish Selected ({selectedIds.size})
+              </Button>
+            )}
+            <Button
+              size="sm" variant="ghost"
+              className="text-zinc-400 hover:text-white"
+              onClick={() => utils.pipeline.draftQueue.invalidate()}
+            >
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Refresh
+            </Button>
+          </div>
         </div>
 
         {queueLoading ? (
@@ -243,9 +302,36 @@ export default function AdminPipeline() {
           </div>
         ) : (
           <div className="space-y-2">
+            {/* Select All row */}
+            <div className="flex items-center gap-3 px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                className="w-4 h-4 accent-[#1BC9C9] cursor-pointer"
+              />
+              <span className="text-xs text-zinc-400 font-semibold">
+                {allSelected ? "Deselect all" : "Select all"} ({allIds.length})
+              </span>
+              {selectedIds.size > 0 && (
+                <span className="ml-auto text-xs text-[#1BC9C9]">{selectedIds.size} selected</span>
+              )}
+            </div>
+
             {draftQueue.map((article) => (
-              <div key={article.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+              <div
+                key={article.id}
+                className={`bg-zinc-900 border rounded-lg p-4 transition-colors ${
+                  selectedIds.has(article.id) ? "border-[#1BC9C9]/50 bg-[#1BC9C9]/5" : "border-zinc-800"
+                }`}
+              >
                 <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(article.id)}
+                    onChange={() => toggleOne(article.id)}
+                    className="w-4 h-4 accent-[#1BC9C9] cursor-pointer mt-0.5 shrink-0"
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       {article.vertical && (
@@ -269,14 +355,45 @@ export default function AdminPipeline() {
                         })}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-white text-sm leading-snug">{article.title}</h3>
+                    <h3
+                      className="font-semibold text-white text-sm leading-snug cursor-pointer hover:text-[#1BC9C9] transition-colors"
+                      onClick={() => setPreviewArticle(article)}
+                    >
+                      {article.title}
+                    </h3>
                     {article.subhead && (
                       <p className="text-zinc-400 text-xs mt-1 line-clamp-2">{article.subhead}</p>
                     )}
                     <div className="flex items-center gap-3 mt-2 text-xs text-zinc-500">
                       {article.authorName && <span>By {article.authorName}</span>}
-                      <span>{article.body.length} chars</span>
+                      <span>{article.body.length.toLocaleString()} chars</span>
                     </div>
+                  </div>
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <Button
+                      size="sm"
+                      className="bg-[#1BC9C9] hover:bg-[#1BC9C9]/80 text-black font-bold text-xs h-7 px-2"
+                      disabled={publishDraftsMutation.isPending}
+                      onClick={() => {
+                        if (confirm(`Publish "${article.title}"?`)) {
+                          publishDraftsMutation.mutate({ ids: [article.id] });
+                        }
+                      }}
+                    >
+                      <CheckCircle className="w-3 h-3 mr-1" /> Publish
+                    </Button>
+                    <Button
+                      size="sm" variant="ghost"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs h-7 px-2"
+                      disabled={rejectDraftMutation.isPending}
+                      onClick={() => {
+                        if (confirm(`Reject and delete "${article.title}"? This cannot be undone.`)) {
+                          rejectDraftMutation.mutate({ id: article.id });
+                        }
+                      }}
+                    >
+                      <Ban className="w-3 h-3 mr-1" /> Reject
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -285,7 +402,7 @@ export default function AdminPipeline() {
         )}
       </div>
 
-      {/* Generate Token Dialog */}
+      {/* ─── Generate Token Dialog ──────────────────────────────────────────── */}
       <Dialog open={showTokenDialog} onOpenChange={(open) => { setShowTokenDialog(open); if (!open) setNewToken(null); }}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white">
           <DialogHeader>
@@ -304,8 +421,7 @@ export default function AdminPipeline() {
                 <div className="flex items-center gap-2 bg-black rounded p-3">
                   <code className="text-[#1BC9C9] text-xs font-mono flex-1 break-all">{newToken}</code>
                   <Button
-                    size="icon"
-                    variant="ghost"
+                    size="icon" variant="ghost"
                     className="h-7 w-7 text-zinc-400 hover:text-[#1BC9C9] shrink-0"
                     onClick={() => copyToClipboard(newToken)}
                   >
@@ -354,6 +470,52 @@ export default function AdminPipeline() {
                 </Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Article Preview Dialog ─────────────────────────────────────────── */}
+      <Dialog open={!!previewArticle} onOpenChange={(open) => { if (!open) setPreviewArticle(null); }}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-['Metropolis',sans-serif] text-[#1BC9C9] text-base leading-snug">
+              {previewArticle?.title}
+            </DialogTitle>
+          </DialogHeader>
+          {previewArticle && (
+            <div className="space-y-3">
+              {previewArticle.subhead && (
+                <p className="text-zinc-300 text-sm italic">{previewArticle.subhead}</p>
+              )}
+              <div className="flex items-center gap-3 text-xs text-zinc-500 pb-2 border-b border-zinc-800">
+                {previewArticle.authorName && <span>By {previewArticle.authorName}</span>}
+                {previewArticle.vertical && (
+                  <Badge className={`text-xs border ${VERTICAL_COLORS[previewArticle.vertical] ?? ""}`}>
+                    {VERTICAL_LABELS[previewArticle.vertical] ?? previewArticle.vertical}
+                  </Badge>
+                )}
+              </div>
+              <div className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto">
+                {previewArticle.body}
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" onClick={() => setPreviewArticle(null)} className="text-zinc-400">
+              Close
+            </Button>
+            <Button
+              className="bg-[#1BC9C9] hover:bg-[#1BC9C9]/80 text-black font-bold"
+              disabled={publishDraftsMutation.isPending}
+              onClick={() => {
+                if (previewArticle && confirm(`Publish "${previewArticle.title}"?`)) {
+                  publishDraftsMutation.mutate({ ids: [previewArticle.id] });
+                  setPreviewArticle(null);
+                }
+              }}
+            >
+              <CheckCircle className="w-4 h-4 mr-2" /> Publish This Article
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

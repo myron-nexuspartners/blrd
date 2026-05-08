@@ -133,3 +133,12 @@
 - [x] Add right-rail ad zone (sidebar rectangle) on Events page
 - [x] Responsive layout: full-width on mobile, 2-col with right rail on desktop
 - [x] Ensure card view and table view both respect active filters without losing items
+
+## v8 — Pipeline Integration & Admin Draft Queue
+- [x] Add articles.list public tRPC query to server/routers.ts
+- [x] Normalize category values (film/movies) across schema, router, and pages
+- [x] Update News.tsx with live trpc.articles.list.useQuery + placeholder fallback
+- [x] Update Blog.tsx with live trpc.articles.list.useQuery (type: blog) + placeholder fallback
+- [x] Build Admin Draft Queue at /admin/pipeline: checkbox list + Publish Selected button
+- [x] Set up BLRD_ADMIN_API_KEY environment secret
+- [x] Write vitest tests for articles.list procedure
