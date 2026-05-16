@@ -1,360 +1,393 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import Layout from "@/components/Layout";
-import { ChevronLeft, ChevronRight, Flame, Play, BookOpen, Tv, Gamepad2, Users, Zap, Music, Cpu } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Gamepad2,
+  BookOpen,
+  Tv,
+  Music,
+  Cpu,
+  Zap,
+  ArrowRight,
+  Users,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
-// ─── Hero Banner Data ──────────────────────────────────────────────────────
-const HERO_SLIDES = [
-  {
-    id: 1,
-    category: "Gaming",
-    tag: "gaming",
-    title: "Level Up Your Game Culture",
-    subhead: "From indie gems to AAA blockbusters — BLRD covers it all with an authentic voice that actually gets it.",
-    cta: "Explore Gaming",
-    ctaHref: "/news?category=gaming",
-    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/hero-gaming_e0fa8e79.jpg",
-    accent: "#00d4ff",
-  },
-  {
-    id: 2,
-    category: "Comics",
-    tag: "comics",
-    title: "Every Panel Tells a Story",
-    subhead: "Dive deep into the universes that shaped geek culture — reviews, news, and creator spotlights.",
-    cta: "Read Comics Coverage",
-    ctaHref: "/news?category=comics",
-    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/hero-comics_0f12ea74.jpg",
-    accent: "#ff6b00",
-  },
-  {
-    id: 3,
-    category: "Movies",
-    tag: "film",
-    title: "Cinema Through a Different Lens",
-    subhead: "Film criticism and coverage that brings fresh perspectives to the stories that move us.",
-    cta: "Watch Our Reviews",
-    ctaHref: "/reviews",
-    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/hero-movies_9cbedcb0.jpg",
-    accent: "var(--blrd-cyan)",
-  },
-  {
-    id: 4,
-    category: "Creators",
-    tag: "creators",
-    title: "Built by Creators, for Creators",
-    subhead: "Connecting passionate fans and content creators across gaming, comics, film, and beyond.",
-    cta: "Meet the Creators",
-    ctaHref: "/discover",
-    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/hero-creators_6a278df8.jpg",
-    accent: "#ff4500",
-  },
-];
+// ─── Design Tokens (scoped to Home light theme) ─────────────────────────────
+const T = {
+  cream:    "#F8F5EF",
+  navy:     "#0B1A2E",
+  charcoal: "#1A1A1A",
+  body:     "#2C2C2C",
+  gold:     "#B8892A",
+  goldMid:  "#C99A3E",
+  goldLight:"#E8C878",
+  muted:    "#555550",
+  rule:     "#D8D3C8",
+  soft:     "#EDE9E0",
+  white:    "#FFFFFF",
+} as const;
 
-// ─── Sample News Data ──────────────────────────────────────────────────────
+// ─── CDN Image URLs ──────────────────────────────────────────────────────────
+const IMGS = {
+  hero:     "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/hero-redesign-main-J9WYNWHkuHdRh4NB8bvaub.webp",
+  gaming:   "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/section-gaming-redesign-7aRN5QkVpFbZpK6552Xpvt.webp",
+  comics:   "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/section-comics-redesign-HUuiQ88mj7VB3K7vZ7XUNi.webp",
+  creators: "https://d2xsxph8kpxj0f.cloudfront.net/310519663453126583/DEtMGVgfKVDqXRWzhEhATX/section-creators-redesign-iviNx73GH2dBFzJ8Jex3RL.webp",
+} as const;
+
+// ─── Vertical config ─────────────────────────────────────────────────────────
+const VERTICALS = [
+  { id: "gaming",               label: "Gaming",                icon: <Gamepad2 size={13} />, href: "/news?vertical=gaming" },
+  { id: "tv-streaming",         label: "TV & Streaming",         icon: <Tv size={13} />,       href: "/news?vertical=tv-streaming" },
+  { id: "music-movies",         label: "Music & Movies",         icon: <Music size={13} />,    href: "/news?vertical=music-movies" },
+  { id: "comics-cosplay-anime", label: "Comics, Cosplay & Anime",icon: <BookOpen size={13} />, href: "/news?vertical=comics-cosplay-anime" },
+  { id: "technology-culture",   label: "Technology & Culture",   icon: <Cpu size={13} />,      href: "/news?vertical=technology-culture" },
+] as const;
+
+// ─── Static placeholder content ──────────────────────────────────────────────
 const POPULAR_ARTICLES = [
   {
-    id: 1, tag: "gaming", label: "Gaming",
+    id: 1, tag: "Gaming", label: "Gaming",
     title: "The Rise of Indie Games Featuring Diverse Protagonists Is Reshaping the Industry",
     subhead: "How small studios are filling the representation gap that major publishers keep ignoring.",
-    comments: 42,
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80",
+    author: "Kai Osei",
+    timeAgo: "2h ago",
   },
   {
-    id: 2, tag: "comics", label: "Comics",
+    id: 2, tag: "Comics", label: "Comics",
     title: "Miles Morales at 15: How One Character Changed What Superhero Stories Could Be",
     subhead: "A look back at the cultural impact of Marvel's Spider-Man and what comes next.",
-    comments: 78,
-    image: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&q=80",
+    author: "Amara Diallo",
+    timeAgo: "4h ago",
   },
   {
-    id: 3, tag: "film", label: "Movies",
+    id: 3, tag: "Movies", label: "Movies",
     title: "Afrofuturism in Film: The Genre That Refuses to Stay Niche",
     subhead: "From Black Panther to Nope — why these films matter beyond the box office.",
-    comments: 55,
-    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80",
-  },
-  {
-    id: 4, tag: "tv", label: "TV",
-    title: "Streaming Wars 2025: Who's Actually Winning the Battle for Geek Culture Audiences?",
-    subhead: "Netflix, Max, Disney+, and Peacock are all fighting for the same eyeballs.",
-    comments: 31,
-    image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829e1?w=400&q=80",
-  },
-  {
-    id: 5, tag: "creators", label: "Creators",
-    title: "Meet the 10 Content Creators Who Are Redefining Geek Culture Coverage in 2025",
-    subhead: "These voices are building communities that mainstream outlets can't replicate.",
-    comments: 19,
-    image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80",
-  },
-  {
-    id: 6, tag: "tech", label: "Tech",
-    title: "AI in Game Development: Creative Tool or Threat to Diverse Storytelling?",
-    subhead: "The debate heating up across studios and the communities that care most.",
-    comments: 88,
-    image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80",
+    author: "Sol Rivera",
+    timeAgo: "6h ago",
   },
 ];
 
 const LATEST_ARTICLES = [
-  {
-    id: 7, tag: "gaming", label: "Gaming",
-    title: "Elden Ring's Shadow of the Erdtree DLC Gets a Surprise Sequel Announcement",
-    subhead: "FromSoftware drops the news fans didn't see coming.",
-    timeAgo: "2h ago",
-  },
-  {
-    id: 8, tag: "comics", label: "Comics",
-    title: "DC's New 'Absolute Universe' Reboot: Everything You Need to Know",
-    subhead: "The publisher's boldest creative gamble in a decade.",
-    timeAgo: "4h ago",
-  },
-  {
-    id: 9, tag: "film", label: "Movies",
-    title: "Jordan Peele's Next Project Is Officially in Production",
-    subhead: "The horror auteur returns with something unexpected.",
-    timeAgo: "6h ago",
-  },
-  {
-    id: 10, tag: "tv", label: "TV",
-    title: "Andor Season 2 Review: The Best Star Wars Content in Years",
-    subhead: "Political, tense, and beautifully crafted — this is what Star Wars can be.",
-    timeAgo: "8h ago",
-  },
-  {
-    id: 11, tag: "tech", label: "Tech",
-    title: "Steam Deck 2 Specs Leaked: Here's What We Know",
-    subhead: "The next-gen handheld could change portable gaming forever.",
-    timeAgo: "10h ago",
-  },
-  {
-    id: 12, tag: "culture", label: "Culture",
-    title: "The Oral History of Black Cosplay: Community, Craft, and Visibility",
-    subhead: "Cosplayers share their stories of building community at conventions.",
-    timeAgo: "12h ago",
-  },
-  {
-    id: 13, tag: "events", label: "Events",
-    title: "BlerdCon 2025 Announces Full Programming Schedule",
-    subhead: "Three days of panels, gaming, and community at the DMV's premier geek event.",
-    timeAgo: "1d ago",
-  },
-  {
-    id: 14, tag: "creators", label: "Creators",
-    title: "How This Twitch Streamer Built a 100K Community Without Compromising Her Vision",
-    subhead: "Authenticity over algorithms — a masterclass in community building.",
-    timeAgo: "1d ago",
-  },
+  { id: 7,  tag: "Gaming",  title: "Elden Ring's Shadow of the Erdtree DLC Gets a Surprise Sequel Announcement",  timeAgo: "2h ago" },
+  { id: 8,  tag: "Comics",  title: "DC's New 'Absolute Universe' Reboot: Everything You Need to Know",             timeAgo: "4h ago" },
+  { id: 9,  tag: "Movies",  title: "Jordan Peele's Next Project Is Officially in Production",                       timeAgo: "6h ago" },
+  { id: 10, tag: "TV",      title: "Andor Season 2 Review: The Best Star Wars Content in Years",                    timeAgo: "8h ago" },
+  { id: 11, tag: "Tech",    title: "Steam Deck 2 Specs Leaked: Here's What We Know",                               timeAgo: "10h ago" },
+  { id: 12, tag: "Culture", title: "The Oral History of Black Cosplay: Community, Craft, and Visibility",          timeAgo: "12h ago" },
+  { id: 13, tag: "Events",  title: "BlerdCon 2025 Announces Full Programming Schedule",                             timeAgo: "1d ago" },
+  { id: 14, tag: "Creators",title: "How This Twitch Streamer Built a 100K Community Without Compromising Her Vision", timeAgo: "1d ago" },
 ];
 
-const CATEGORY_SECTIONS = [
-  {
-    id: "gaming", label: "Gaming", icon: <Gamepad2 size={14} />, color: "var(--blrd-cyan)",
-    articles: [
-      { title: "Best RPGs of 2025 So Far: Our Running List", tag: "gaming" },
-      { title: "Tekken 8 Season 3 Patch Notes: Full Breakdown", tag: "gaming" },
-      { title: "Why Baldur's Gate 3 Still Matters Two Years Later", tag: "gaming" },
-      { title: "The Most Anticipated Games of Q3 2025", tag: "gaming" },
-    ],
-  },
-  {
-    id: "comics", label: "Comics", icon: <BookOpen size={14} />, color: "var(--blrd-orange)",
-    articles: [
-      { title: "Absolute Batman #1 Review: A Dark Knight Reimagined", tag: "comics" },
-      { title: "Marvel's Summer of Symbiotes Event Explained", tag: "comics" },
-      { title: "5 Indie Comics You Should Be Reading Right Now", tag: "comics" },
-      { title: "The Best Graphic Novels of 2025 (Updated Monthly)", tag: "comics" },
-    ],
-  },
-  {
-    id: "tv", label: "TV", icon: <Tv size={14} />, color: "var(--blrd-cyan)",
-    articles: [
-      { title: "The Last of Us Season 3: Everything We Know", tag: "tv" },
-      { title: "Fallout Season 2 Renewal: What's Coming Next", tag: "tv" },
-      { title: "Arcane Season 2 Retrospective: A Visual Masterpiece", tag: "tv" },
-      { title: "Best Sci-Fi Shows Streaming Right Now", tag: "tv" },
-    ],
-  },
-  {
-    id: "creators", label: "Creators", icon: <Users size={14} />, color: "var(--blrd-flame)",
-    articles: [
-      { title: "Creator Spotlight: The Podcasters Changing Gaming Discourse", tag: "creators" },
-      { title: "How to Build a Geek Culture Brand in 2025", tag: "creators" },
-      { title: "The Best Gaming YouTube Channels You're Not Watching", tag: "creators" },
-      { title: "Community Voices: Fan Fiction as Cultural Commentary", tag: "creators" },
-    ],
-  },
+const TOP_RATED = [
+  { title: "Elden Ring: Shadow of the Erdtree", rating: 5, tag: "Games" },
+  { title: "Andor Season 2",                    rating: 5, tag: "TV" },
+  { title: "Absolute Batman #1",                rating: 4, tag: "Comics" },
 ];
 
-// ─── Vertical config ───────────────────────────────────────────────────
-const VERTICALS = [
-  { id: "gaming",               label: "Gaming",               color: "var(--blrd-cyan)",   icon: <Gamepad2 size={14} />,  href: "/news?vertical=gaming" },
-  { id: "tv-streaming",         label: "TV & Streaming",        color: "var(--blrd-orange)", icon: <Tv size={14} />,        href: "/news?vertical=tv-streaming" },
-  { id: "music-movies",         label: "Music & Movies",        color: "var(--blrd-flame)",  icon: <Music size={14} />,     href: "/news?vertical=music-movies" },
-  { id: "comics-cosplay-anime", label: "Comics, Cosplay & Anime", color: "var(--blrd-cyan)", icon: <BookOpen size={14} />,  href: "/news?vertical=comics-cosplay-anime" },
-  { id: "technology-culture",   label: "Technology & Culture",  color: "var(--blrd-orange)", icon: <Cpu size={14} />,       href: "/news?vertical=technology-culture" },
-] as const;
+const TRENDING_TAGS = [
+  "#Gaming2025", "#AfroFuturism", "#IndieDev", "#BlackComics",
+  "#GeekCulture", "#Cosplay", "#Streaming", "#Esports",
+  "#ScienceFiction", "#CreatorEconomy",
+];
 
-type VerticalId = typeof VERTICALS[number]["id"];
+// ─── Shared font helpers ─────────────────────────────────────────────────────
+const serif = "'Playfair Display', Georgia, serif";
+const sans  = "'Jost', 'Inter', sans-serif";
 
-// ─── Latest by Vertical Section ─────────────────────────────────────────────────
+// ─── Category Tag (light theme) ──────────────────────────────────────────────
+function Tag({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        fontFamily: sans,
+        fontSize: "0.6rem",
+        fontWeight: 700,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        padding: "2px 8px",
+        borderRadius: "2px",
+        background: `${T.gold}18`,
+        color: T.gold,
+        border: `1px solid ${T.gold}44`,
+        display: "inline-block",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+// ─── Flame Rating Display ─────────────────────────────────────────────────────
+function FlameDisplay({ rating, max = 5 }: { rating: number; max?: number }) {
+  return (
+    <span title={`${rating}/${max} Flames`}>
+      {Array.from({ length: max }).map((_, i) => (
+        <span
+          key={i}
+          style={{
+            fontSize: "0.9rem",
+            filter: i < Math.round(rating) ? "none" : "grayscale(1) opacity(0.2)",
+          }}
+        >
+          🔥
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// ─── Section Divider ─────────────────────────────────────────────────────────
+function SectionLabel({ children, gold = false }: { children: React.ReactNode; gold?: boolean }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        marginBottom: "20px",
+      }}
+    >
+      <span
+        style={{
+          fontFamily: sans,
+          fontSize: "0.65rem",
+          fontWeight: 700,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          color: gold ? T.gold : T.charcoal,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {children}
+      </span>
+      <div style={{ flex: 1, height: "1px", background: `linear-gradient(to right, ${T.rule}, transparent)` }} />
+    </div>
+  );
+}
+
+// ─── Featured Article Card (large, with image) ───────────────────────────────
+function FeaturedCard({ article }: { article: typeof POPULAR_ARTICLES[0] }) {
+  return (
+    <Link href={`/news/${article.id}`}>
+      <div
+        className="group"
+        style={{
+          background: T.white,
+          border: `1px solid ${T.rule}`,
+          borderRadius: "4px",
+          overflow: "hidden",
+          cursor: "pointer",
+          transition: "box-shadow 0.2s ease, transform 0.15s ease",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 6px 28px rgba(11,26,46,0.12)";
+          (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+          (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+        }}
+      >
+        <div style={{ height: "180px", overflow: "hidden" }}>
+          <img
+            src={article.image}
+            alt={article.title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transition: "transform 0.4s ease",
+            }}
+            className="group-hover:scale-105"
+          />
+        </div>
+        <div style={{ padding: "16px" }}>
+          <Tag label={article.label} />
+          <h3
+            style={{
+              fontFamily: serif,
+              fontSize: "1rem",
+              fontWeight: 700,
+              color: T.charcoal,
+              lineHeight: 1.35,
+              marginTop: "8px",
+              marginBottom: "6px",
+            }}
+          >
+            {article.title}
+          </h3>
+          <p style={{ fontFamily: sans, fontSize: "0.8rem", color: T.muted, lineHeight: 1.5 }}>
+            {article.subhead}
+          </p>
+          <div
+            style={{
+              marginTop: "10px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontFamily: sans,
+              fontSize: "0.7rem",
+              color: T.muted,
+            }}
+          >
+            <span style={{ fontWeight: 600, color: T.gold }}>{article.author}</span>
+            <span>·</span>
+            <span>{article.timeAgo}</span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ─── Latest Item (compact list row) ──────────────────────────────────────────
+function LatestItem({ article }: { article: typeof LATEST_ARTICLES[0] }) {
+  return (
+    <Link href={`/news/${article.id}`}>
+      <div
+        style={{
+          padding: "12px 0",
+          borderBottom: `1px solid ${T.rule}`,
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => {
+          const h = (e.currentTarget as HTMLDivElement).querySelector("h4") as HTMLElement | null;
+          if (h) h.style.color = T.gold;
+        }}
+        onMouseLeave={(e) => {
+          const h = (e.currentTarget as HTMLDivElement).querySelector("h4") as HTMLElement | null;
+          if (h) h.style.color = T.charcoal;
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+          <Tag label={article.tag} />
+          <span style={{ fontFamily: sans, fontSize: "0.65rem", color: T.muted, marginLeft: "auto" }}>
+            {article.timeAgo}
+          </span>
+        </div>
+        <h4
+          style={{
+            fontFamily: serif,
+            fontSize: "0.88rem",
+            fontWeight: 600,
+            color: T.charcoal,
+            lineHeight: 1.35,
+            transition: "color 0.15s ease",
+          }}
+        >
+          {article.title}
+        </h4>
+      </div>
+    </Link>
+  );
+}
+
+// ─── Latest by Vertical (live data) ──────────────────────────────────────────
 function LatestByVertical() {
   const { data, isLoading } = trpc.articles.latestByVertical.useQuery();
 
-  // Skeleton placeholder while loading
-  if (isLoading) {
-    return (
-      <div className="mb-8">
-        <div className="section-header">
-          <Zap size={14} style={{ color: "var(--blrd-cyan)" }} />
-          <h2 style={{ color: "var(--blrd-cyan)" }}>Latest by Vertical</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          {VERTICALS.map((v) => (
-            <div
-              key={v.id}
-              className="blrd-card p-4 animate-pulse"
-              style={{ minHeight: 140, borderTop: `3px solid ${v.color}` }}
-            >
-              <div className="h-3 rounded mb-2" style={{ background: "var(--blrd-dark-3)", width: "40%" }} />
-              <div className="h-4 rounded mb-1" style={{ background: "var(--blrd-dark-3)", width: "90%" }} />
-              <div className="h-3 rounded" style={{ background: "var(--blrd-dark-3)", width: "70%" }} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="mb-8">
-      <div className="section-header">
-        <Zap size={14} style={{ color: "var(--blrd-cyan)" }} />
-        <h2 style={{ color: "var(--blrd-cyan)" }}>Latest by Vertical</h2>
-        <Link href="/news">
-          <span
-            className="ml-auto text-xs font-ui transition-colors hover:text-white"
-            style={{ color: "var(--blrd-gray)" }}
-          >
-            View All News →
-          </span>
-        </Link>
-      </div>
+    <div style={{ marginBottom: "48px" }}>
+      <SectionLabel gold>Latest by Vertical</SectionLabel>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: "16px",
+        }}
+      >
         {VERTICALS.map((v, i) => {
-          const article = data?.[i] ?? null;
-          const cfg = v;
-
-          if (!article) {
-            // Empty state card — vertical exists but no published article yet
-            return (
-              <Link key={v.id} href={cfg.href}>
-                <div
-                  className="blrd-card p-4 group cursor-pointer flex flex-col justify-between"
-                  style={{ minHeight: 140, borderTop: `3px solid ${cfg.color}` }}
-                >
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <span style={{ color: cfg.color }}>{cfg.icon}</span>
-                      <span
-                        className="text-xs font-display font-bold uppercase tracking-wider"
-                        style={{ color: cfg.color }}
-                      >
-                        {cfg.label}
-                      </span>
-                    </div>
-                    <p className="text-xs italic" style={{ color: "var(--blrd-gray)" }}>
-                      No articles yet. Check back soon.
-                    </p>
-                  </div>
-                  <span
-                    className="text-xs font-ui mt-3 transition-colors group-hover:text-white"
-                    style={{ color: cfg.color }}
-                  >
-                    Explore {cfg.label} →
-                  </span>
-                </div>
-              </Link>
-            );
-          }
-
-          const publishedDate = article.publishedAt
-            ? new Date(article.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-            : "";
+          const article = isLoading ? null : (data?.[i] ?? null);
 
           return (
-            <Link key={v.id} href={`/news/${article.slug}`}>
+            <Link key={v.id} href={article ? `/news/${(article as { slug?: string }).slug ?? ""}` : v.href}>
               <div
-                className="blrd-card p-4 group cursor-pointer flex flex-col justify-between"
-                style={{ minHeight: 140, borderTop: `3px solid ${cfg.color}` }}
+                style={{
+                  background: T.white,
+                  border: `1px solid ${T.rule}`,
+                  borderTop: `3px solid ${T.gold}`,
+                  borderRadius: "4px",
+                  padding: "16px",
+                  cursor: "pointer",
+                  minHeight: "140px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  transition: "box-shadow 0.2s ease, transform 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(11,26,46,0.1)";
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                }}
               >
-                {/* Thumbnail if available */}
-                {article.imageUrl && (
-                  <div className="w-full h-24 rounded overflow-hidden mb-3 -mx-0">
-                    <img
-                      src={article.imageUrl}
-                      alt={article.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                )}
-
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span style={{ color: cfg.color }}>{cfg.icon}</span>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                    <span style={{ color: T.gold }}>{v.icon}</span>
                     <span
-                      className="text-xs font-display font-bold uppercase tracking-wider"
-                      style={{ color: cfg.color }}
+                      style={{
+                        fontFamily: sans,
+                        fontSize: "0.6rem",
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: T.gold,
+                      }}
                     >
-                      {cfg.label}
+                      {v.label}
                     </span>
-                    {publishedDate && (
-                      <span className="ml-auto text-xs" style={{ color: "var(--blrd-gray)" }}>
-                        {publishedDate}
-                      </span>
-                    )}
                   </div>
 
-                  <h4
-                    className="text-sm font-semibold leading-snug line-clamp-3 transition-colors group-hover:text-cyan-400"
-                    style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
-                  >
-                    {article.title}
-                  </h4>
-
-                  {article.subhead && (
-                    <p
-                      className="text-xs mt-1 line-clamp-2"
-                      style={{ color: "var(--blrd-gray)" }}
+                  {isLoading ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <div style={{ height: "10px", borderRadius: "2px", background: T.rule, width: "90%" }} />
+                      <div style={{ height: "10px", borderRadius: "2px", background: T.rule, width: "70%" }} />
+                    </div>
+                  ) : article ? (
+                    <h4
+                      style={{
+                        fontFamily: serif,
+                        fontSize: "0.82rem",
+                        fontWeight: 600,
+                        color: T.charcoal,
+                        lineHeight: 1.35,
+                      }}
                     >
-                      {article.subhead}
-                    </p>
-                  )}
-
-                  {article.authorName && (
-                    <p className="text-xs mt-2" style={{ color: "var(--blrd-gray)" }}>
-                      By{" "}
-                      {article.authorSlug ? (
-                        <Link href={`/authors/${article.authorSlug}`}>
-                          <span className="transition-colors hover:text-cyan-400" style={{ color: cfg.color }}>
-                            {article.authorName}
-                          </span>
-                        </Link>
-                      ) : (
-                        <span style={{ color: cfg.color }}>{article.authorName}</span>
-                      )}
+                      {(article as { title: string }).title}
+                    </h4>
+                  ) : (
+                    <p style={{ fontFamily: sans, fontSize: "0.75rem", color: T.muted, fontStyle: "italic" }}>
+                      No articles yet. Check back soon.
                     </p>
                   )}
                 </div>
 
                 <span
-                  className="text-xs font-ui mt-3 transition-colors group-hover:text-white"
-                  style={{ color: cfg.color }}
+                  style={{
+                    fontFamily: sans,
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    color: T.gold,
+                    marginTop: "12px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
                 >
-                  Read More →
+                  {article ? "Read More" : `Explore ${v.label}`} <ArrowRight size={11} />
                 </span>
               </div>
             </Link>
@@ -365,415 +398,647 @@ function LatestByVertical() {
   );
 }
 
-// ─── Flame Rating Display ───────────────────────────────────────────────────
-function FlameDisplay({ rating, max = 5 }: { rating: number; max?: number }) {
-  return (
-    <span className="flame-rating" title={`${rating}/${max} Flames`}>
-      {Array.from({ length: max }).map((_, i) => (
-        <span key={i} className={`flame-icon ${i < Math.round(rating) ? "active" : ""}`}>
-          🔥
-        </span>
-      ))}
-    </span>
-  );
-}
-
-// ─── Article Card ─────────────────────────────────────────────────────────
-function ArticleCard({ article }: { article: typeof POPULAR_ARTICLES[0] }) {
-  return (
-    <Link href={`/news/${article.id}`}>
-      <div className="blrd-card flex gap-3 p-3 group">
-        <div className="w-24 h-20 shrink-0 rounded overflow-hidden bg-gray-800">
-          <img
-            src={article.image}
-            alt={article.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <span className={`blrd-tag blrd-tag-${article.tag} mb-1`}>{article.label}</span>
-          <h3
-            className="text-sm font-semibold leading-tight mb-1 line-clamp-2 transition-colors group-hover:text-cyan-400"
-            style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
-          >
-            {article.title}
-          </h3>
-          <p className="text-xs line-clamp-1" style={{ color: "var(--blrd-gray)" }}>
-            {article.subhead}
-          </p>
-          {article.comments !== undefined && (
-            <span className="text-xs mt-1 block" style={{ color: "var(--blrd-gray)" }}>
-              💬 {article.comments}
-            </span>
-          )}
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-// ─── Latest Item ──────────────────────────────────────────────────────────
-function LatestItem({ article }: { article: typeof LATEST_ARTICLES[0] }) {
-  return (
-    <Link href={`/news/${article.id}`}>
-      <div
-        className="py-3 border-b group cursor-pointer"
-        style={{ borderColor: "var(--blrd-border)" }}
-      >
-        <div className="flex items-start gap-2 mb-1">
-          <span className={`blrd-tag blrd-tag-${article.tag} shrink-0`}>{article.label}</span>
-          <span className="text-xs ml-auto shrink-0" style={{ color: "var(--blrd-gray)" }}>
-            {article.timeAgo}
-          </span>
-        </div>
-        <h3
-          className="text-sm font-semibold leading-snug transition-colors group-hover:text-cyan-400"
-          style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
-        >
-          {article.title}
-        </h3>
-        <p className="text-xs mt-0.5 line-clamp-1" style={{ color: "var(--blrd-gray)" }}>
-          {article.subhead}
-        </p>
-      </div>
-    </Link>
-  );
-}
-
-// ─── Hero Carousel ────────────────────────────────────────────────────────
-function HeroCarousel() {
-  const [current, setCurrent] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      goNext();
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [current]);
-
-  const goTo = (idx: number) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrent(idx);
-    setTimeout(() => setIsTransitioning(false), 500);
-  };
-
-  const goPrev = () => goTo((current - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  const goNext = () => goTo((current + 1) % HERO_SLIDES.length);
-
-  const slide = HERO_SLIDES[current];
-
+// ─── Hero Section ─────────────────────────────────────────────────────────────
+function EditorialHero() {
   return (
     <div
-      className="hero-slide relative w-full"
-      style={{ height: "clamp(280px, 45vw, 480px)" }}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "clamp(320px, 50vw, 540px)",
+        overflow: "hidden",
+      }}
     >
-      {/* Background Image */}
+      {/* Background image */}
       <img
-        src={slide.image}
-        alt={slide.category}
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-        style={{ opacity: isTransitioning ? 0.5 : 1 }}
+        src={IMGS.hero}
+        alt="BLRD — Diverse geek culture community"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center 30%",
+        }}
       />
 
-      {/* Overlay gradient */}
+      {/* Gradient overlay — left-heavy for text legibility */}
       <div
-        className="absolute inset-0"
         style={{
+          position: "absolute",
+          inset: 0,
           background:
-            "linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.2) 75%, transparent 100%)",
-          zIndex: 1,
+            "linear-gradient(to right, rgba(11,26,46,0.92) 0%, rgba(11,26,46,0.72) 40%, rgba(11,26,46,0.3) 70%, transparent 100%)",
         }}
       />
 
       {/* Content */}
       <div
-        className="absolute inset-0 flex items-center"
-        style={{ zIndex: 2, padding: "0 clamp(16px, 4vw, 48px)" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 clamp(20px, 5vw, 64px)",
+          zIndex: 2,
+        }}
       >
-        <div className="max-w-lg">
+        <div style={{ maxWidth: "520px" }}>
           <span
-            className={`blrd-tag blrd-tag-${slide.tag} mb-3 inline-block`}
-            style={{ fontSize: "0.65rem" }}
+            style={{
+              fontFamily: sans,
+              fontSize: "0.6rem",
+              fontWeight: 700,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: T.goldLight,
+              display: "block",
+              marginBottom: "12px",
+            }}
           >
-            {slide.category}
+            Blerd Vision Entertainment
           </span>
           <h1
-            className="font-display font-black leading-tight mb-3"
             style={{
-              fontSize: "clamp(1.4rem, 3.5vw, 2.4rem)",
-              color: "var(--blrd-white)",
-              textShadow: `0 0 40px ${slide.accent}44`,
+              fontFamily: serif,
+              fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)",
+              fontWeight: 800,
+              color: T.white,
+              lineHeight: 1.15,
+              marginBottom: "16px",
+              letterSpacing: "-0.01em",
             }}
           >
-            {slide.title}
+            Where Geek Culture Finds Its Authentic Voice
           </h1>
           <p
-            className="mb-4 leading-relaxed"
             style={{
-              fontSize: "clamp(0.8rem, 1.5vw, 1rem)",
-              color: "var(--blrd-gray-light)",
-              maxWidth: "420px",
+              fontFamily: sans,
+              fontSize: "clamp(0.85rem, 1.6vw, 1rem)",
+              color: "rgba(248,245,239,0.85)",
+              lineHeight: 1.65,
+              marginBottom: "24px",
+              maxWidth: "400px",
             }}
           >
-            {slide.subhead}
+            Gaming, comics, film, TV, and creators — covered by and for the community that actually lives this culture.
           </p>
-          <Link href={slide.ctaHref}>
-            <button
-              className="px-5 py-2.5 rounded text-sm font-ui font-bold tracking-wider transition-all hover:brightness-110"
-              style={{
-                background: slide.accent,
-                color: "var(--blrd-black)",
-                letterSpacing: "0.1em",
-              }}
-            >
-              {slide.cta} →
-            </button>
-          </Link>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <Link href="/news">
+              <button
+                style={{
+                  fontFamily: sans,
+                  fontWeight: 700,
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  padding: "12px 24px",
+                  borderRadius: "3px",
+                  background: T.gold,
+                  color: T.white,
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background 0.15s ease",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = T.goldMid)}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = T.gold)}
+              >
+                Explore News <ArrowRight size={14} />
+              </button>
+            </Link>
+            <Link href="/discover">
+              <button
+                style={{
+                  fontFamily: sans,
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  padding: "12px 24px",
+                  borderRadius: "3px",
+                  background: "transparent",
+                  color: T.white,
+                  border: `1px solid rgba(248,245,239,0.4)`,
+                  cursor: "pointer",
+                  transition: "border-color 0.15s ease, background 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = T.goldLight;
+                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(184,137,42,0.12)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(248,245,239,0.4)";
+                  (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                }}
+              >
+                Discover More
+              </button>
+            </Link>
+          </div>
         </div>
-      </div>
-
-      {/* Controls */}
-      <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3" style={{ zIndex: 3 }}>
-        {HERO_SLIDES.map((s, i) => (
-          <button
-            key={s.id}
-            onClick={() => goTo(i)}
-            className="transition-all rounded-full"
-            style={{
-              width: i === current ? "24px" : "8px",
-              height: "8px",
-              background: i === current ? slide.accent : "rgba(255,255,255,0.3)",
-            }}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Arrow Controls */}
-      <button
-        onClick={goPrev}
-        className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all hover:scale-110"
-        style={{ background: "rgba(0,0,0,0.7)", color: "var(--blrd-white)", zIndex: 3 }}
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={18} />
-      </button>
-      <button
-        onClick={goNext}
-        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all hover:scale-110"
-        style={{ background: "rgba(0,0,0,0.7)", color: "var(--blrd-white)", zIndex: 3 }}
-        aria-label="Next slide"
-      >
-        <ChevronRight size={18} />
-      </button>
-
-      {/* Slide counter */}
-      <div
-        className="absolute top-4 right-4 text-xs font-display"
-        style={{ color: "rgba(255,255,255,0.5)", zIndex: 3 }}
-      >
-        {String(current + 1).padStart(2, "0")} / {String(HERO_SLIDES.length).padStart(2, "0")}
       </div>
     </div>
   );
 }
 
-// ─── Main Home Component ──────────────────────────────────────────────────
+// ─── Visual Feature Strip (3-column image grid) ───────────────────────────────
+function FeatureStrip() {
+  const items = [
+    {
+      img: IMGS.gaming,
+      label: "Gaming",
+      headline: "Level Up Your Game Culture",
+      href: "/news?vertical=gaming",
+    },
+    {
+      img: IMGS.comics,
+      label: "Comics & Anime",
+      headline: "Every Panel Tells a Story",
+      href: "/news?vertical=comics-cosplay-anime",
+    },
+    {
+      img: IMGS.creators,
+      label: "Creators",
+      headline: "Built by Creators, for Creators",
+      href: "/discover",
+    },
+  ];
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+        gap: "2px",
+        marginBottom: "48px",
+      }}
+    >
+      {items.map((item) => (
+        <Link key={item.label} href={item.href}>
+          <div
+            style={{
+              position: "relative",
+              height: "220px",
+              overflow: "hidden",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              const img = (e.currentTarget as HTMLDivElement).querySelector("img") as HTMLImageElement | null;
+              if (img) img.style.transform = "scale(1.06)";
+            }}
+            onMouseLeave={(e) => {
+              const img = (e.currentTarget as HTMLDivElement).querySelector("img") as HTMLImageElement | null;
+              if (img) img.style.transform = "scale(1)";
+            }}
+          >
+            <img
+              src={item.img}
+              alt={item.label}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                transition: "transform 0.4s ease",
+              }}
+            />
+            {/* Dark gradient overlay */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(to top, rgba(11,26,46,0.85) 0%, rgba(11,26,46,0.2) 60%, transparent 100%)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: "16px",
+                left: "16px",
+                right: "16px",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: sans,
+                  fontSize: "0.55rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: T.goldLight,
+                  display: "block",
+                  marginBottom: "4px",
+                }}
+              >
+                {item.label}
+              </span>
+              <h3
+                style={{
+                  fontFamily: serif,
+                  fontSize: "1.05rem",
+                  fontWeight: 700,
+                  color: T.white,
+                  lineHeight: 1.25,
+                }}
+              >
+                {item.headline}
+              </h3>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+// ─── Ad Zone (light theme) ────────────────────────────────────────────────────
+function AdZone({ width, height, label }: { width: string; height: string; label: string }) {
+  return (
+    <div
+      style={{
+        width,
+        height,
+        background: T.soft,
+        border: `1px dashed ${T.rule}`,
+        borderRadius: "4px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "4px",
+        position: "relative",
+      }}
+    >
+      <span
+        style={{
+          position: "absolute",
+          top: "6px",
+          left: "10px",
+          fontFamily: sans,
+          fontSize: "0.45rem",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: T.muted,
+          opacity: 0.6,
+        }}
+      >
+        Advertisement
+      </span>
+      <span style={{ fontFamily: sans, fontSize: "0.7rem", color: T.muted }}>{label}</span>
+    </div>
+  );
+}
+
+// ─── Main Home Component ──────────────────────────────────────────────────────
 export default function Home() {
   return (
     <Layout showSidebar={false}>
-      {/* Hero Carousel — full width, no container */}
-      <HeroCarousel />
+      {/* ── Light-theme wrapper — scoped to Home only ── */}
+      <div
+        style={{
+          background: T.cream,
+          color: T.body,
+          fontFamily: sans,
+        }}
+      >
+        {/* Top Ad Banner */}
+        <div style={{ background: T.soft, borderBottom: `1px solid ${T.rule}` }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1.5rem" }}>
+            <AdZone width="100%" height="80px" label="Your Ad Here · 728×90" />
+          </div>
+        </div>
 
-      {/* Main content with sidebar layout */}
-      <div className="container py-6">
-        <div className="flex gap-6">
-          {/* Main column */}
-          <div className="flex-1 min-w-0">
-            {/* Popular Now + Latest */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {/* Popular Now */}
-              <div>
-                <div className="section-header">
-                  <h2>Popular Now</h2>
+        {/* Hero */}
+        <EditorialHero />
+
+        {/* Feature Strip */}
+        <FeatureStrip />
+
+        {/* Main content area */}
+        <div
+          style={{
+            maxWidth: "1280px",
+            margin: "0 auto",
+            padding: "0 1.5rem 64px",
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gap: "40px",
+            }}
+            id="home-content-grid"
+          >
+            {/* ── Main Column ── */}
+            <div>
+              {/* Popular + Latest grid */}
+              <div
+                style={{ display: "grid", gap: "40px", marginBottom: "48px", gridTemplateColumns: "1fr" }}
+                id="popular-latest-grid"
+              >
+                {/* Popular Now */}
+                <div>
+                  <SectionLabel>Popular Now</SectionLabel>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {POPULAR_ARTICLES.map((a) => (
+                      <FeaturedCard key={a.id} article={a} />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-3">
-                  {POPULAR_ARTICLES.map((a) => (
-                    <ArticleCard key={a.id} article={a} />
-                  ))}
+
+                {/* Latest */}
+                <div>
+                  <SectionLabel>Latest</SectionLabel>
+                  <div>
+                    {LATEST_ARTICLES.map((a) => (
+                      <LatestItem key={a.id} article={a} />
+                    ))}
+                  </div>
+                  <Link href="/news">
+                    <button
+                      style={{
+                        width: "100%",
+                        marginTop: "16px",
+                        padding: "10px",
+                        fontFamily: sans,
+                        fontSize: "0.78rem",
+                        fontWeight: 600,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        color: T.gold,
+                        background: "transparent",
+                        border: `1px solid ${T.gold}55`,
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                        transition: "background 0.15s ease, border-color 0.15s ease",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.background = `${T.gold}12`;
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = T.gold;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = `${T.gold}55`;
+                      }}
+                    >
+                      See All Articles <ArrowRight size={13} />
+                    </button>
+                  </Link>
                 </div>
               </div>
 
-              {/* Latest */}
-              <div>
-                <div className="section-header">
-                  <h2>Latest</h2>
-                </div>
+              {/* Latest by Vertical — live DB data */}
+              <LatestByVertical />
+
+              {/* Discover CTA Banner */}
+              <div
+                style={{
+                  background: T.navy,
+                  borderRadius: "6px",
+                  padding: "32px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                  marginBottom: "48px",
+                }}
+                id="discover-cta-inner"
+              >
                 <div>
-                  {LATEST_ARTICLES.map((a) => (
-                    <LatestItem key={a.id} article={a} />
-                  ))}
-                </div>
-                <Link href="/news">
-                  <button
-                    className="w-full mt-4 py-2.5 text-sm font-ui font-semibold rounded border transition-colors hover:border-cyan-500 hover:text-cyan-400"
+                  <span
                     style={{
-                      borderColor: "var(--blrd-border)",
-                      color: "var(--blrd-gray-light)",
-                      letterSpacing: "0.08em",
+                      fontFamily: sans,
+                      fontSize: "0.6rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      color: T.goldLight,
+                      display: "block",
+                      marginBottom: "6px",
                     }}
                   >
-                    See More Articles →
+                    Premium Content
+                  </span>
+                  <h3
+                    style={{
+                      fontFamily: serif,
+                      fontSize: "1.4rem",
+                      fontWeight: 700,
+                      color: T.white,
+                      lineHeight: 1.25,
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Discover the BLRD Network
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: sans,
+                      fontSize: "0.85rem",
+                      color: "rgba(248,245,239,0.75)",
+                      lineHeight: 1.6,
+                      maxWidth: "380px",
+                    }}
+                  >
+                    Curated articles, videos, and podcasts from creators and brands in the BLRD ecosystem.
+                  </p>
+                </div>
+                <Link href="/discover">
+                  <button
+                    style={{
+                      fontFamily: sans,
+                      fontWeight: 700,
+                      fontSize: "0.8rem",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      padding: "12px 28px",
+                      borderRadius: "3px",
+                      background: T.gold,
+                      color: T.white,
+                      border: "none",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      transition: "background 0.15s ease",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = T.goldMid)}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = T.gold)}
+                  >
+                    Explore Discover <ArrowRight size={14} />
                   </button>
                 </Link>
               </div>
+
+              {/* Bottom Ad Banner */}
+              <AdZone width="100%" height="90px" label="Your Ad Here · 728×90" />
             </div>
 
-            {/* Latest by Vertical — live data from DB */}
-            <LatestByVertical />
+            {/* ── Sidebar ── */}
+            <aside
+              style={{ display: "none" }}
+              id="home-sidebar"
+            >
+              {/* Ad */}
+              <AdZone width="100%" height="250px" label="300×250" />
 
-            {/* Category Sections */}
-            {CATEGORY_SECTIONS.map((section) => (
-              <div key={section.id} className="mb-8">
-                <div className="section-header">
-                  <span style={{ color: section.color }}>{section.icon}</span>
-                  <h2 style={{ color: section.color }}>{section.label}</h2>
+              {/* Trending Topics */}
+              <div
+                style={{
+                  background: T.white,
+                  border: `1px solid ${T.rule}`,
+                  borderRadius: "4px",
+                  padding: "20px",
+                }}
+              >
+                <SectionLabel gold>Trending Topics</SectionLabel>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {TRENDING_TAGS.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontFamily: sans,
+                        fontSize: "0.7rem",
+                        fontWeight: 500,
+                        padding: "4px 10px",
+                        borderRadius: "2px",
+                        background: T.soft,
+                        color: T.body,
+                        border: `1px solid ${T.rule}`,
+                        cursor: "pointer",
+                        transition: "background 0.15s ease, color 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLSpanElement).style.background = `${T.gold}18`;
+                        (e.currentTarget as HTMLSpanElement).style.color = T.gold;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLSpanElement).style.background = T.soft;
+                        (e.currentTarget as HTMLSpanElement).style.color = T.body;
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {section.articles.map((article, i) => (
-                    <Link key={i} href={`/news?category=${section.id}`}>
+              </div>
+
+              {/* Top Rated */}
+              <div
+                style={{
+                  background: T.white,
+                  border: `1px solid ${T.rule}`,
+                  borderRadius: "4px",
+                  padding: "20px",
+                }}
+              >
+                <SectionLabel gold>Top Rated</SectionLabel>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  {TOP_RATED.map((item, i) => (
+                    <Link key={i} href="/reviews">
                       <div
-                        className="blrd-card p-3 group cursor-pointer"
-                        style={{ borderLeft: `3px solid ${section.color}` }}
+                        style={{ cursor: "pointer" }}
+                        onMouseEnter={(e) => {
+                          const h = (e.currentTarget as HTMLDivElement).querySelector("span.title") as HTMLElement | null;
+                          if (h) h.style.color = T.gold;
+                        }}
+                        onMouseLeave={(e) => {
+                          const h = (e.currentTarget as HTMLDivElement).querySelector("span.title") as HTMLElement | null;
+                          if (h) h.style.color = T.charcoal;
+                        }}
                       >
-                        <span className={`blrd-tag blrd-tag-${article.tag} mb-2`}>
-                          {section.label}
-                        </span>
-                        <h4
-                          className="text-sm font-semibold leading-snug transition-colors group-hover:text-cyan-400"
-                          style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
+                        <span
+                          className="title"
+                          style={{
+                            fontFamily: serif,
+                            fontSize: "0.85rem",
+                            fontWeight: 600,
+                            color: T.charcoal,
+                            display: "block",
+                            marginBottom: "4px",
+                            lineHeight: 1.3,
+                            transition: "color 0.15s ease",
+                          }}
                         >
-                          {article.title}
-                        </h4>
+                          {item.title}
+                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <FlameDisplay rating={item.rating} />
+                          <Tag label={item.tag} />
+                        </div>
                       </div>
                     </Link>
                   ))}
                 </div>
-                <Link href={`/news?category=${section.id}`}>
-                  <span
-                    className="text-xs mt-2 inline-block font-ui transition-colors hover:text-white"
-                    style={{ color: section.color }}
-                  >
-                    More {section.label} →
-                  </span>
-                </Link>
               </div>
-            ))}
 
-            {/* Discover CTA Banner */}
-            <div
-              className="rounded p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4"
-              style={{
-                background: "linear-gradient(135deg, rgba(27,201,201,0.1) 0%, rgba(27,201,201,0.1) 100%)",
-                border: "1px solid rgba(27,201,201,0.2)",
-              }}
-            >
-              <div>
-                <h3 className="font-display text-sm font-bold mb-1" style={{ color: "var(--blrd-cyan)" }}>
-                  DISCOVER PREMIUM CONTENT
-                </h3>
-                <p className="text-sm" style={{ color: "var(--blrd-gray-light)" }}>
-                  Explore curated articles, videos, and podcasts from creators and brands in the BLRD network.
-                </p>
-              </div>
-              <Link href="/discover">
-                <button
-                  className="shrink-0 px-5 py-2.5 rounded text-sm font-ui font-bold tracking-wider transition-all hover:brightness-110"
+              {/* Authors CTA */}
+              <div
+                style={{
+                  background: T.navy,
+                  borderRadius: "4px",
+                  padding: "20px",
+                  textAlign: "center",
+                }}
+              >
+                <Users size={24} style={{ color: T.goldLight, margin: "0 auto 10px" }} />
+                <h4
                   style={{
-                    background: "var(--blrd-cyan)",
-                    color: "var(--blrd-black)",
-                    letterSpacing: "0.1em",
+                    fontFamily: serif,
+                    fontSize: "1rem",
+                    fontWeight: 700,
+                    color: T.white,
+                    marginBottom: "6px",
                   }}
                 >
-                  Explore Discover →
-                </button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <aside className="hidden xl:flex flex-col gap-4 w-[300px] shrink-0">
-            {/* Ad */}
-            <div className="ad-zone ad-sidebar">
-              <span className="mt-6 text-xs opacity-50 text-center px-2">Your Ad Here<br />300×250</span>
-            </div>
-
-            {/* Trending Topics */}
-            <div
-              className="rounded p-4"
-              style={{ background: "var(--blrd-dark-2)", border: "1px solid var(--blrd-border)" }}
-            >
-              <h3 className="font-display text-xs font-bold mb-3 tracking-widest uppercase" style={{ color: "var(--blrd-cyan)" }}>
-                Trending Topics
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {["#Gaming2025", "#AfroFuturism", "#IndieDev", "#BlackComics", "#GeekCulture", "#Cosplay", "#Streaming", "#Esports", "#ScienceFiction", "#CreatorEconomy"].map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs px-2 py-1 rounded cursor-pointer transition-colors hover:text-white font-ui"
+                  Meet Our Writers
+                </h4>
+                <p
+                  style={{
+                    fontFamily: sans,
+                    fontSize: "0.75rem",
+                    color: "rgba(248,245,239,0.7)",
+                    marginBottom: "14px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  5 beat writers covering every corner of geek culture.
+                </p>
+                <Link href="/authors">
+                  <button
                     style={{
-                      background: "var(--blrd-dark-3)",
-                      color: "var(--blrd-gray-light)",
-                      border: "1px solid var(--blrd-border)",
+                      fontFamily: sans,
+                      fontWeight: 600,
+                      fontSize: "0.72rem",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      padding: "8px 18px",
+                      borderRadius: "3px",
+                      background: "transparent",
+                      color: T.goldLight,
+                      border: `1px solid ${T.goldLight}55`,
+                      cursor: "pointer",
+                      transition: "background 0.15s ease",
                     }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = `${T.gold}22`)}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "transparent")}
                   >
-                    {tag}
-                  </span>
-                ))}
+                    View Authors
+                  </button>
+                </Link>
               </div>
-            </div>
 
-            {/* Top Reviews */}
-            <div
-              className="rounded p-4"
-              style={{ background: "var(--blrd-dark-2)", border: "1px solid var(--blrd-border)" }}
-            >
-              <h3 className="font-display text-xs font-bold mb-3 tracking-widest uppercase" style={{ color: "var(--blrd-orange)" }}>
-                Top Rated
-              </h3>
-              <div className="flex flex-col gap-3">
-                {[
-                  { title: "Elden Ring: Shadow of the Erdtree", rating: 5, category: "games" },
-                  { title: "Andor Season 2", rating: 5, category: "tv" },
-                  { title: "Absolute Batman #1", rating: 4, category: "comics" },
-                ].map((item, i) => (
-                  <Link key={i} href="/reviews">
-                    <div className="group cursor-pointer">
-                      <div className="flex items-start justify-between gap-2">
-                        <span
-                          className="text-xs font-semibold leading-snug group-hover:text-cyan-400 transition-colors"
-                          style={{ fontFamily: "Inter, sans-serif", color: "var(--blrd-white)" }}
-                        >
-                          {item.title}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <FlameDisplay rating={item.rating} />
-                        <span className={`blrd-tag blrd-tag-${item.category}`}>{item.category}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Ad */}
-            <div className="ad-zone ad-sidebar">
-              <span className="mt-6 text-xs opacity-50 text-center px-2">Your Ad Here<br />300×250</span>
-            </div>
-          </aside>
+              {/* Ad */}
+              <AdZone width="100%" height="250px" label="300×250" />
+            </aside>
+          </div>
         </div>
       </div>
     </Layout>
