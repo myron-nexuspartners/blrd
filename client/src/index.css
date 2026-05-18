@@ -405,28 +405,3 @@
     }
   }
 }
-
-/* ─── Home Page Light Theme — Responsive Layout ─────────────────────────── */
-/* These rules are scoped to IDs used only on the Home page redesign */
-@media (min-width: 768px) {
-  #popular-latest-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media (min-width: 1024px) {
-  #home-content-grid {
-    grid-template-columns: 1fr 300px;
-  }
-  #home-sidebar {
-    display: flex !important;
-    flex-direction: column;
-    gap: 24px;
-  }
-}
-@media (min-width: 640px) {
-  #discover-cta-inner {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
